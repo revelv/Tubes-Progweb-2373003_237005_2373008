@@ -104,6 +104,7 @@ body {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+
 hr {
   margin: 1rem 0;
   color: inherit;
@@ -10947,7 +10948,7 @@ header.masthead {
   padding-bottom: 6rem;
   text-align: center;
   color: #fff;
-  background-image: url("../assets/img/header-bg.jpg");
+  background-image: url("../assets/img/aesthetic-pink-purple-keyboard-upcs1h9i14iu7fn3.jpg");
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-position: center center;
@@ -10975,16 +10976,22 @@ header.masthead .masthead-heading {
   }
   header.masthead .masthead-subheading {
     font-size: 2.25rem;
-    font-style: italic;
+    font-style:normal;
     line-height: 2.25rem;
     margin-bottom: 2rem;
   }
   header.masthead .masthead-heading {
-    font-size: 4.5rem;
+    font-size: 2rem;
+    font-family:Arial, Helvetica, sans-serif;
+    font-style: italic;
     font-weight: 700;
+    -webkit-text-stroke: 2px black;
     line-height: 4.5rem;
     margin-bottom: 4rem;
+    color: white;
+    
   }
+ 
 }
 #portfolio .portfolio-item {
   max-width: 26rem;
