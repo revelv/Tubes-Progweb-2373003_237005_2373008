@@ -66,13 +66,13 @@ if (isset($_GET['logout'])) {
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0" style="gap: 2rem;">
                     <li class="nav-item">
-                        <a class="nav-link" href="/Tubes-Progweb-2373003_237005_2373008/Tubes/HOME/index.html">Home</a>
+                        <a class="nav-link" href="./HOME/index.html">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Tubes-Progweb-2373003_237005_2373008/Tubes/produk.php">Products</a>
+                        <a class="nav-link" href="./produk.php">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Tubes-Progweb-2373003_237005_2373008//Tubes/HOME/index.html#about">About Us</a>
+                        <a class="nav-link" href="./HOME/index.html#about">About Us</a>
                     </li>
                     <?php
                     $cart_count = 0;
@@ -86,7 +86,7 @@ if (isset($_GET['logout'])) {
                     }
                     ?>
                     <li class="nav-item"> 
-                        <a class="nav-link" href="/Tubes-Progweb-2373003_237005_2373008/Tubes/carts/index.html">
+                        <a class="nav-link" href="./cart.php">
                             <i class="bi-cart-fill me-2"></i>
                             Carts [<?= $cart_count ?>]
                         </a>

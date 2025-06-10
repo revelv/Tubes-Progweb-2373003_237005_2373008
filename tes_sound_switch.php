@@ -7,7 +7,7 @@ class SwitchPreview {
     public function __construct() {
         $this->switches = [
             'red' => [
-                'sound' => 'sounds/red_switch.mp3',
+                'sound' => 'Cherry_MX_Red.mp3',
                 'desc' => 'Linear - Halus tanpa bump'
             ],
 

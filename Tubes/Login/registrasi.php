@@ -208,6 +208,7 @@
             </div>
 
             <button type="submit" class="btn btn-success">Register</button>
+            <a href="../produk.php">back</a>
         </form>
     </div>
 </body>

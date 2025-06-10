@@ -1,5 +1,5 @@
 <?php
-include 'koneksi.php';
+include '../database/koneksi.php';
 
 // Cek koneksi
 if ($conn->connect_error) {
