@@ -8,13 +8,14 @@ if (isset($_SESSION['kd_cs'])) {
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="cart.css">
+    <meta charset="UTF-8">
     <title>Styrk Industries</title>
 </head>
 
 <body>
-    <div class="container">
+    <div class="container_cart">
         <div class="row">
             <?php
             if (isset($_SESSION['kd_cs'])) {
@@ -30,17 +31,42 @@ if (isset($_SESSION['kd_cs'])) {
                             <div class="caption">
                                 <h3><?= $get_product['nama_produk']; ?></h3>
                                 <h4><?= $get_product['harga']; ?></h4>
+                                <input type="checkbox" name="check" value="<?= $kode_cs ?>">
                             </div>
-
                         </div>
+
                     </div>
             <?php
                 }
-            }else{
+            } else {
                 echo "Anda Belum Login";
-                
             }
             ?>
+
+            <?php
+            $cek_cart = mysqli_query($conn, "SELECT COUNT(cart_id) as count from carts where customer_id ='$kode_cs'");
+            $row = mysqli_fetch_assoc($cek_cart);
+            $cart_count = $row['count'];
+
+            if ($cart_count > 0) {
+            ?>
+                <div class="button">
+                    <form action="">
+                        <button type="">Proceed to Checkout</button>
+                    </form>
+                    <form method="post">
+                        <button type="sumbit" name="hapus" onclick="return confirm('Yakin ingin remove dari cart?')">Remove</button>
+                    </form>
+                </div>
+            <?php
+            } else {
+            ?>
+                <h1>Anda Belum Menambahkan Item!</h1>
+            <?php
+            }
+            ?>
+
+
         </div>
     </div>
 </body>
