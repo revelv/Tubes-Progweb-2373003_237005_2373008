@@ -1,5 +1,6 @@
 <?php
 include 'koneksi.php';
+include 'header_admin.php';
 
 // --- Hapus Order ---
 if (isset($_GET['hapus'])) {
@@ -101,19 +102,8 @@ $result = mysqli_query($conn, $query);
 </head>
 
 <body class="bg-gray-900 text-white p-6">
-  <!-- NAV -->
-  <nav class="bg-gray-800 shadow px-6 py-4 flex justify-between items-center mb-6">
-    <h1 class="text-xl font-bold text-yellow-400">Stryk Admin</h1>
-    <div class="space-x-6 text-sm text-white">
-      <a href="index_admin.php" class="hover:text-yellow-400">Home</a>
-      <a href="produk_admin.php" class="hover:text-yellow-400">Produk</a>
-      <a href="customer_admin.php" class="hover:text-yellow-400">Customer</a>
-      <a href="order_admin.php" class="hover:text-yellow-400 font-semibold">Order</a>
-      <a href="struk_admin.php" class="hover:text-yellow-400">Struk</a>
-    </div>
-  </nav>
 
-  <h1 class="text-2xl font-bold text-yellow-400 mb-6">Manajemen Order</h1>
+  <h1 class="text-2xl font-bold text-yellow-400 mb-6">Order Dashboard</h1>
 
   <!-- Filter Pencarian -->
   <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -146,69 +136,6 @@ $result = mysqli_query($conn, $query);
     </div>
   </form>
 
-  <!-- Form Tambah/Edit -->
-  <div class="bg-gray-800 rounded-lg shadow p-6 mb-8">
-    <h2 class="text-xl font-semibold text-yellow-400 mb-4">
-      <?= $edit ? "Edit Order ID: {$edit['order_id']}" : 'Tambah Order Baru' ?>
-    </h2>
-    
-    <form method="POST" class="space-y-4">
-      <?php if ($edit): ?>
-        <input type="hidden" name="order_id" value="<?= $edit['order_id'] ?>">
-      <?php endif; ?>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-gray-300 mb-1">Customer</label>
-          <select name="customer_id" required class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
-            <?php mysqli_data_seek($customers, 0); while ($customer = mysqli_fetch_assoc($customers)): ?>
-              <option value="<?= $customer['customer_id'] ?>" 
-                <?= ($edit && $edit['customer_id'] == $customer['customer_id']) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($customer['nama']) ?>
-              </option>
-            <?php endwhile; ?>
-          </select>
-        </div>
-        
-        <div>
-          <label class="block text-gray-300 mb-1">Tanggal Order</label>
-          <input type="datetime-local" name="tgl_order" 
-                 value="<?= $edit ? date('Y-m-d\TH:i', strtotime($edit['tgl_order'])) : date('Y-m-d\TH:i') ?>" 
-                 required class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
-        </div>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-gray-300 mb-1">Total Harga</label>
-          <input type="text" name="total_harga" value="<?= $edit['total_harga'] ?? '' ?>" required
-                 class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
-        </div>
-        
-        <div>
-          <label class="block text-gray-300 mb-1">Status</label>
-          <select name="status" required class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
-            <option value="pending" <?= ($edit && $edit['status'] === 'pending') ? 'selected' : '' ?>>Pending</option>
-            <option value="proses" <?= ($edit && $edit['status'] === 'proses') ? 'selected' : '' ?>>Proses</option>
-            <option value="selesai" <?= ($edit && $edit['status'] === 'selesai') ? 'selected' : '' ?>>Selesai</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="flex space-x-3 pt-2">
-        <button type="submit" name="<?= $edit ? 'update' : 'insert' ?>" 
-                class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-6 rounded">
-          <?= $edit ? 'Simpan Perubahan' : 'Tambah Order' ?>
-        </button>
-        
-        <?php if ($edit): ?>
-          <a href="order_admin.php" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded">
-            Batal
-          </a>
-        <?php endif; ?>
-      </div>
-    </form>
-  </div>
 
   <!-- Tabel Order -->
   <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -251,10 +178,7 @@ $result = mysqli_query($conn, $query);
         Tracking
       </a>
     <?php endif; ?>
-    <a href="order_admin.php?edit=<?= $row['order_id'] ?>" 
-       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-      Edit
-    </a>
+
     <a href="order_admin.php?hapus=<?= $row['order_id'] ?>" 
        onclick="return confirm('Yakin hapus order ini?')"
        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">

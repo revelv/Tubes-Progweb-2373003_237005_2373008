@@ -1,5 +1,6 @@
 <?php
 include 'koneksi.php';
+include 'header_admin.php';
 
 // --- Hapus Produk ---
 if (isset($_GET['hapus'])) {
@@ -79,7 +80,7 @@ $search = $_GET['search'] ?? '';
 $category_filter = $_GET['category'] ?? '';
 
 // Query untuk mendapatkan semua kategori unik
-$categories_result = mysqli_query($conn, "SELECT DISTINCT category FROM products ORDER BY category");
+$categories_result = mysqli_query($conn, "SELECT DISTINCT category FROM category ORDER BY category");
 
 // Query utama dengan filter
 $query = "SELECT * FROM products WHERE 1=1";
@@ -114,19 +115,9 @@ $result = mysqli_query($conn, $query);
 </head>
 
 <body class="bg-gray-900 text-white p-6">
-  <!-- NAV -->
-  <nav class="bg-gray-800 shadow px-6 py-4 flex justify-between items-center mb-6">
-    <h1 class="text-xl font-bold text-yellow-400">Stryk Admin</h1>
-    <div class="space-x-6 text-sm text-white">
-      <a href="index_admin.php" class="hover:text-yellow-400">Home</a>
-      <a href="produk_admin.php" class="hover:text-yellow-400">Produk</a>
-      <a href="customer_admin.php" class="hover:text-yellow-400">Customer</a>
-      <a href="order_admin.php" class="hover:text-yellow-400 font-semibold">Order</a>
-      <a href="struk_admin.php" class="hover:text-yellow-400">Struk</a>
-    </div>
-  </nav>
 
-  <h1 class="text-2xl font-bold text-yellow-400 mb-6">Manajemen Order</h1>
+
+  <h1 class="text-2xl font-bold text-yellow-400 mb-6">Product Dashboard</h1>
 
   <!-- Filter Pencarian -->
   <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -201,11 +192,20 @@ $result = mysqli_query($conn, $query);
         </div>
       </div>
 
+      
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-gray-300 mb-1">Kategori</label>
-          <input type="text" name="category" value="<?= $edit['category'] ?? '' ?>" required
-            class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+          <select name="category" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+            <option value="">Semua Kategori</option>
+            <?php 
+            $categories_result = mysqli_query($conn, "SELECT DISTINCT category FROM category ORDER BY category");
+            while ($cat = mysqli_fetch_assoc($categories_result)): ?>
+              <option value="<?= $cat['category'] ?>" <?= $category_filter === $cat['category'] ? 'selected' : '' ?>>
+                <?= $cat['category'] ?>
+              </option>
+            <?php endwhile; ?>
+          </select>
         </div>
 
         <div>
