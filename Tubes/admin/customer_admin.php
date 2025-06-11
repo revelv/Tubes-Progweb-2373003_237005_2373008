@@ -1,5 +1,6 @@
 <?php
 include 'koneksi.php';
+include 'header_admin.php';
 
 // --- Hapus Customer ---
 if (isset($_GET['hapus'])) {
@@ -82,19 +83,8 @@ $result = mysqli_query($conn, $query);
 </head>
 
 <body class="bg-gray-900 text-white p-6">
-  <!-- NAV -->
-  <nav class="bg-gray-800 shadow px-6 py-4 flex justify-between items-center mb-6">
-    <h1 class="text-xl font-bold text-yellow-400">Stryk Admin</h1>
-    <div class="space-x-6 text-sm text-white">
-      <a href="index_admin.php" class="hover:text-yellow-400">Home</a>
-      <a href="produk_admin.php" class="hover:text-yellow-400">Produk</a>
-      <a href="customer_admin.php" class="hover:text-yellow-400 font-semibold">Customer</a>
-      <a href="order_admin.php" class="hover:text-yellow-400">Order</a>
-      <a href="struk_admin.php" class="hover:text-yellow-400">Struk</a>
-    </div>
-  </nav>
 
-  <h1 class="text-2xl font-bold text-yellow-400 mb-6">Manajemen Customer</h1>
+  <h1 class="text-2xl font-bold text-yellow-400 mb-6">Customer Dashboard</h1>
 
   <!-- Filter Pencarian -->
   <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

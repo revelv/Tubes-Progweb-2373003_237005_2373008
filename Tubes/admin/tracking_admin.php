@@ -1,5 +1,6 @@
 <?php
 include 'koneksi.php';
+include 'header_admin.php';
 
 $order_id = $_GET['order_id'] ?? 0;
 
@@ -49,14 +50,7 @@ $tracking_data = $current_tracking ? explode('|', $current_tracking) : [];
 </head>
 
 <body class="bg-gray-900 text-white p-6">
-  <!-- NAV -->
-  <nav class="bg-gray-800 shadow px-6 py-4 flex justify-between items-center mb-6">
-    <h1 class="text-xl font-bold text-yellow-400">Stryk Admin</h1>
-    <div class="space-x-6 text-sm text-white">
-      <a href="index_admin.php" class="hover:text-yellow-400">Home</a>
-      <a href="order_admin.php" class="hover:text-yellow-400">Kembali ke Order</a>
-    </div>
-  </nav>
+
 
   <div class="max-w-4xl mx-auto">
     <h1 class="text-2xl font-bold text-yellow-400 mb-2">Tracking Order #<?= $order['order_id'] ?></h1>
