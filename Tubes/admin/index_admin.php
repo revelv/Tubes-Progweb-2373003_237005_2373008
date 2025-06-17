@@ -19,6 +19,7 @@ include 'koneksi.php';
   
   <main class="p-6">
     <h2 class="text-2xl text-yellow-400">Selamat datang di Admin Panel Stryk Industries</h2>
+    <a href="logout_admin.php">Logout</a>
     <p class="mt-2 text-gray-300">Silakan pilih menu di bawah untuk mengelola data:</p>
     
     <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

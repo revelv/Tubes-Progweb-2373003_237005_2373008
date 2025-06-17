@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 17, 2025 at 03:01 PM
+-- Generation Time: Jun 17, 2025 at 04:48 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -38,7 +38,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`admin_id`, `username`, `password`) VALUES
-(101, 'admin', 'admin');
+(101, 'admin', '$2y$10$fbdJi7jdC0xfeKCuZSDaG.Fv6TM7Hiuway3HYMDNnwqKziU9TsOUy');
 
 -- --------------------------------------------------------
 
