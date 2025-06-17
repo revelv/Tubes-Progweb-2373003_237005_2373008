@@ -53,7 +53,7 @@ if (isset($_GET['logout'])) {
 
 <body>
     <nav class="navbar navbar-expand-lg">
-        <div class="container">
+        <div class="container_header">
             <a class="navbar-brand" href="./HOME/index.html">
                 <img src="https://i.postimg.cc/855ZSty7/no-bg.png" alt="Styrk Industries">
             </a>

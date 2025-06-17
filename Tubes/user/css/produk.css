@@ -1,5 +1,13 @@
 /* Container Utama */
-.container {
+
+#judul {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #2e2a0d;
+}
+.container_produk {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
@@ -7,7 +15,7 @@
 }
 
 /* Judul "Our Products" */
-.container h2 {
+.container_produk h2 {
     width: 100%;
     border-bottom: 4px solid rgb(255, 221, 0);
     padding-bottom: 10px;

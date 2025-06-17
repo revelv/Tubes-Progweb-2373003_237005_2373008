@@ -1,74 +1,115 @@
 <?php
 include 'header.php';
 
-if (isset($_SESSION['kd_cs'])) {
-    $kode_cs = $_SESSION['kd_cs'];
+if (!isset($_SESSION['kd_cs'])) {
+    header("Location: login.php");
+    exit();
 }
+
+$customer_id = $_SESSION['kd_cs'];
+$query = "SELECT p.*, c.jumlah_barang, c.cart_id 
+          FROM carts c 
+          JOIN products p ON c.product_id = p.product_id 
+          WHERE c.customer_id = '$customer_id'";
+$result = mysqli_query($conn, $query);
+$total = 0;
 ?>
+
 <html lang="en">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="cart.css">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/cart.css">
     <title>Styrk Industries</title>
 </head>
 
 <body>
-    <div class="container_cart">
-        <div class="row">
-            <?php
-            if (isset($_SESSION['kd_cs'])) {
-                $result = mysqli_query($conn, "SELECT * FROM carts WHERE customer_id ='$kode_cs'");
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $product_id = $row['product_id'];
-                    $product = mysqli_query($conn, "SELECT * FROM products WHERE product_id='$product_id'");
-                    $get_product = mysqli_fetch_assoc($product);
-            ?>
-                    <div class="col-sm-6 col-md-4">
-                        <div class="thumbnail">
-                            <a href="#"><img id="gambar" src="<?= $get_product['link_gambar']; ?>"> </a>
-                            <div class="caption">
-                                <h3><?= $get_product['nama_produk']; ?></h3>
-                                <h4><?= $get_product['harga']; ?></h4>
-                                <input type="checkbox" name="check" value="<?= $kode_cs ?>">
-                            </div>
-                        </div>
+    <div class="container_cart mt-4">
+        <h2 class="mb-4">Your Shopping Cart</h2>
 
-                    </div>
-            <?php
-                }
-            } else {
-                echo "Anda Belum Login";
-            }
-            ?>
+        <?php if (mysqli_num_rows($result) > 0): ?>
+            <form action="update_cart.php" method="post">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = mysqli_fetch_assoc($result)):
+                            $harga_clean = str_replace(['$', ','], '', $row['harga']);
+                            $harga_numerik = (float)$harga_clean;
+                            $subtotal = $harga_numerik * $row['jumlah_barang'];
+                            $total += $subtotal;
+                        ?>
+                            <tr>
+                                <td><?= $row['nama_produk']; ?></td>
+                                <td>$<?= number_format($harga_numerik, 2); ?></td>
+                                <td>
+                                    <div class="input-group" style="width: 120px;">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm quantity-minus" data-id="<?= $row['cart_id']; ?>">-</button>
+                                        <input type="number" name="quantity[<?= $row['cart_id']; ?>]"
+                                            value="<?= $row['jumlah_barang']; ?>"
+                                            min="1" class="form-control text-center">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm quantity-plus" data-id="<?= $row['cart_id']; ?>">+</button>
+                                    </div>
+                                </td>
+                                <td>$<?= number_format($subtotal, 2); ?></td>
+                                <td>
+                                    <a href="remove_from_cart.php?cart_id=<?= $row['cart_id']; ?>"
+                                        class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3">Total</th>
+                            <th colspan="2">$<?= number_format($total, 2); ?></th>
+                        </tr>
+                    </tfoot>
+                </table>
 
-            <?php
-            $cek_cart = mysqli_query($conn, "SELECT COUNT(cart_id) as count from carts where customer_id ='$kode_cs'");
-            $row = mysqli_fetch_assoc($cek_cart);
-            $cart_count = $row['count'];
-
-            if ($cart_count > 0) {
-            ?>
-                <div class="button">
-                    <form action="">
-                        <button type="">Proceed to Checkout</button>
-                    </form>
-                    <form method="post">
-                        <button type="sumbit" name="hapus" onclick="return confirm('Yakin ingin remove dari cart?')">Remove</button>
-                    </form>
+                <div class="text-end">
+                    <button type="submit" name="update_cart" class="btn btn-primary">
+                        <i class="bi bi-arrow-repeat"></i> Update Cart
+                    </button>
+                    <a href="checkout.php" class="btn btn-success">
+                        <i class="bi bi-credit-card"></i> Checkout
+                    </a>
                 </div>
-            <?php
-            } else {
-            ?>
-                <h1>Anda Belum Menambahkan Item!</h1>
-            <?php
-            }
-            ?>
-
-
-        </div>
+            </form>
+        <?php else: ?>
+            <div class="alert alert-info">Your cart is empty. <a href="produk.php">Browse Products</a></div>
+        <?php endif; ?>
     </div>
+
+    <!-- JavaScript untuk tombol +/- -->
+    <script>
+        document.querySelectorAll('.quantity-plus').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                input.value = parseInt(input.value) + 1;
+            });
+        });
+
+        document.querySelectorAll('.quantity-minus').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                if (parseInt(input.value) > 1) {
+                    input.value = parseInt(input.value) - 1;
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

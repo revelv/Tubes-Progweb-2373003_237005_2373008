@@ -1,102 +1,297 @@
+/* cart.css */
+:root {
+    --black: #000000;
+    --gold: #D4AF37;
+    --light-gold: #F5E6B3;
+    --dark-gray: #222222;
+    --medium-gray: #444444;
+    --light-gray: #F8F9FA;
+    --white: #FFFFFF;
+}
 
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 0;
-        color: #2d3436;
-    }
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--white);
+    color: var(--dark-gray);
+    line-height: 1.6;
+}
 
+.container_cart {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 20px;
+}
+
+/* Header */
+h2 {
+    color: var(--black);
+    font-weight: 700;
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+/* Table Styles */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+}
+
+.table thead {
+    background: linear-gradient(135deg, var(--black), var(--dark-gray));
+}
+
+.table th {
+    color: var(--gold);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 18px 15px;
+    text-align: center;
+    border: none;
+    position: relative;
+}
+
+.table th:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background-color: rgba(212, 175, 55, 0.3);
+}
+
+.table td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: var(--white);
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover td {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.table tfoot th {
+    background-color: var(--light-gray);
+    color: var(--black);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.table tfoot td {
+    font-weight: 700;
+    background-color: var(--light-gray);
+    color: var(--black);
+    font-size: 1.1rem;
+}
+
+/* Action Button Styles */
+.btn-danger {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-width: auto;
+}
+
+/* Table Cell Alignment */
+.table td {
+  padding: 10px 12px;
+}
+
+/* Quantity Input Group */
+.input-group {
+  width: 110px;
+}
+
+.input-group button {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+}
+
+.input-group input {
+  width: 36px;
+  height: 28px;
+  font-size: 13px;
+}
+
+/* Center Alignment for Action Cells */
+.table td:last-child {
+  text-align: center;
+  padding: 10px 8px;
+}
+
+/* Remove Button Container */
+.action-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Footer Total Row */
+.table tfoot th,
+.table tfoot td {
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* Input Group Styles */
+.input-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: 120px;
+  height: 100%; /* Ensure full height of cell */
+}
+
+.input-group button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+}
+
+.input-group input {
+  width: 40px;
+  height: 32px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-left: none;
+  border-right: none;
+  margin: 0 -1px;
+  padding: 0;
+}
+
+/* Ensure perfect vertical alignment in table cells */
+.table td {
+  vertical-align: middle;
+  padding: 12px 16px; /* Adjusted padding for better vertical centering */
+}
+
+
+
+/* Alert Styles */
+.alert-info {
+    background-color: var(--light-gray);
+    border-left: 4px solid var(--gold);
+    color: var(--dark-gray);
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.alert-info a {
+    color: var(--gold);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px dotted var(--gold);
+}
+
+.alert-info a:hover {
+    color: var(--black);
+    border-bottom: 1px solid var(--black);
+}
+
+/* Text Alignment */
+.text-end {
+    text-align: right;
+    margin-top: 30px;
+}
+
+/* Quantity Buttons */
+.quantity-minus, .quantity-plus {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* Animation Effects */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.table tbody tr {
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+}
+
+.table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
     .container_cart {
-        max-width: auto;
-        margin: 30px auto;
-        padding: 0 20px;
+        padding: 0 15px;
     }
-
-    .row {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+    
+    .table {
+        display: block;
+        overflow-x: auto;
     }
-
-    .thumbnail {
-        display: flex;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        transition: all 0.3s ease;
-        align-items: center;
-        padding: 15px;
-    }
-
-    .thumbnail:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    #gambar {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-right: 20px;
-    }
-
-    .caption {
-        flex-grow: 1;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .product-info {
-        flex: 1;
-    }
-
-    .caption h3 {
-        margin: 0 0 8px 0;
-        font-size: 1.2rem;
-        color: #2d3436;
-        font-weight: 600;
-    }
-
-    .caption h4 {
-        margin: 0;
-        font-size: 1.3rem;
-        color: #e74c3c;
-        font-weight: 700;
-    }
-
-    /* Message for not logged in users */
-    .container > p {
+    
+    .text-end {
         text-align: center;
-        font-size: 1.2rem;
-        color: #7f8c8d;
-        padding: 50px 0;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-        margin: 20px 0;
     }
-
-    /* Responsive adjustments */
-    @media (max-width: 600px) {
-        .thumbnail {
-            flex-direction: column;
-            text-align: center;
-        }
-        
-        #gambar {
-            margin-right: 0;
-            margin-bottom: 15px;
-            width: 100%;
-            height: auto;
-            max-height: 200px;
-        }
-        
-        .caption {
-            flex-direction: column;
-            text-align: center;
-        }
+    
+    .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
     }
+    
+    .btn + .btn {
+        margin-left: 0;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+    
+    h2::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
