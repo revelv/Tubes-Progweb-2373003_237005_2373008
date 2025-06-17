@@ -7,11 +7,13 @@
     letter-spacing: 2px;
     color: #2e2a0d;
 }
+
 .container_produk {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    text-align: center; /* Agar judul rata tengah */
+    text-align: center;
+    /* Agar judul rata tengah */
 }
 
 /* Judul "Our Products" */
@@ -19,8 +21,10 @@
     width: 100%;
     border-bottom: 4px solid rgb(255, 221, 0);
     padding-bottom: 10px;
-    margin-bottom: 30px; /* Jarak dari konten produk */
-    text-align: center; /* Teks rata tengah */
+    margin-bottom: 30px;
+    /* Jarak dari konten produk */
+    text-align: center;
+    /* Teks rata tengah */
     color: #000000;
     font-size: 2rem;
 }
@@ -29,24 +33,30 @@
 .row {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between; /* Membagi 3 box secara merata */
-    gap: 20px; /* Jarak antar box */
+    justify-content: space-between;
+    /* Membagi 3 box secara merata */
+    gap: 20px;
+    /* Jarak antar box */
 }
 
 /* Box Produk (3 per baris) */
 .col-sm-6.col-md-4 {
-    flex: 0 0 calc(33.333% - 20px); /* Lebar 33% dengan jarak 20px */
+    flex: 0 0 calc(33.333% - 20px);
+    /* Lebar 33% dengan jarak 20px */
     max-width: calc(33.333% - 20px);
-    box-sizing: border-box; /* Agar padding tidak mempengaruhi lebar */
+    box-sizing: border-box;
+    /* Agar padding tidak mempengaruhi lebar */
 }
 
 /* Kotak Produk */
 .thumbnail {
     width: 100%;
-    height: 450px; /* Tinggi tetap */
+    height: 450px;
+    /* Tinggi tetap */
     border: 1px solid #ddd;
     border-radius: 8px;
-    overflow: hidden; /* Gambar tidak melebihi kotak */
+    overflow: hidden;
+    /* Gambar tidak melebihi kotak */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     display: flex;
@@ -61,8 +71,10 @@
 /* Gambar Produk */
 #gambar {
     width: 100%;
-    height: 250px; /* Tinggi gambar */
-    object-fit: cover; /* Gambar mengisi area tanpa distorsi */
+    height: 250px;
+    /* Tinggi gambar */
+    object-fit: cover;
+    /* Gambar mengisi area tanpa distorsi */
 }
 
 /* Deskripsi Produk */
@@ -70,9 +82,8 @@
     padding: 15px;
     text-align: center;
 }
-.button{
 
-}
+.button {}
 
 
 .caption h3 {
@@ -88,3 +99,229 @@
     margin: 5px 0;
 }
 
+/* Modal Styling */
+#detailModal .modal-content {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+#detailModal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.2rem 1.5rem;
+}
+
+#detailModal .modal-title {
+    font-weight: 600;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+#detailModal .modal-body {
+    padding: 2rem;
+}
+
+#detailModal .btn-close {
+    font-size: 0.8rem;
+}
+
+/* Product Image */
+#modal-gambar {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+#modal-gambar:hover {
+    transform: scale(1.02);
+}
+
+/* Product Info */
+#modal-nama {
+    font-family: 'Poppins', sans-serif;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+#detailModal p {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    color: #555;
+}
+
+#detailModal strong {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Stock Indicator */
+#modal-stok {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Buttons */
+#modal-button-container .btn {
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+#modal-button-container .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+#modal-button-container .btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+#modal-button-container .btn-secondary {
+    background-color: #6c757d;
+}
+
+/* Modal Styling */
+#detailModal .modal-content {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+#detailModal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.2rem 1.5rem;
+}
+
+#detailModal .modal-title {
+    font-weight: 600;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+#detailModal .modal-body {
+    padding: 2rem;
+}
+
+#detailModal .btn-close {
+    font-size: 0.8rem;
+}
+
+/* Product Image */
+#modal-gambar {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+#modal-gambar:hover {
+    transform: scale(1.02);
+}
+
+/* Product Info */
+#modal-nama {
+    font-family: 'Poppins', sans-serif;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+#detailModal p {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    color: #555;
+}
+
+#detailModal strong {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Stock Indicator */
+#modal-stok {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Buttons */
+#modal-button-container .btn {
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+#modal-button-container .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+#modal-button-container .btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+#modal-button-container .btn-secondary {
+    background-color: #6c757d;
+}
+
+/* Audio Button */
+#toggle-audio {
+    background-color: #007bff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+#toggle-audio:hover {
+    background-color: #0069d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #detailModal .modal-body {
+        flex-direction: column;
+    }
+    
+    #modal-gambar {
+        max-width: 100% !important;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Animation for modal appearance */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal.fade .modal-dialog {
+    animation: modalFadeIn 0.3s ease-out;
+}

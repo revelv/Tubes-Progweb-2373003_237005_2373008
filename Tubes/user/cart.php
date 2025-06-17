@@ -6,6 +6,18 @@ if (!isset($_SESSION['kd_cs'])) {
     exit();
 }
 
+if (isset($_SESSION['message'])) {
+    echo "<script>alert('" . $_SESSION['message'] . "');</script>";
+    unset($_SESSION['message']);
+}
+
+if (isset($_SESSION['alert'])) {
+    echo "<script>alert('" . $_SESSION['alert'] . "');</script>";
+    unset($_SESSION['alert']);
+}
+
+
+
 $customer_id = $_SESSION['kd_cs'];
 $query = "SELECT p.*, c.jumlah_barang, c.cart_id 
           FROM carts c 
@@ -94,19 +106,37 @@ $total = 0;
 
     <!-- JavaScript untuk tombol +/- -->
     <script>
-        document.querySelectorAll('.quantity-plus').forEach(button => {
-            button.addEventListener('click', function() {
-                const input = this.parentElement.querySelector('input');
-                input.value = parseInt(input.value) + 1;
-            });
-        });
+ 
 
-        document.querySelectorAll('.quantity-minus').forEach(button => {
+        document.querySelectorAll('.quantity-plus, .quantity-minus').forEach(button => {
             button.addEventListener('click', function() {
                 const input = this.parentElement.querySelector('input');
-                if (parseInt(input.value) > 1) {
-                    input.value = parseInt(input.value) - 1;
+                let currentQty = parseInt(input.value);
+                const cartId = this.dataset.id;
+
+                if (this.classList.contains('quantity-plus')) {
+                    currentQty += 1;
+                } else if (currentQty > 1) {
+                    currentQty -= 1;
                 }
+
+                input.value = currentQty;
+
+                // Kirim data ke update_cart.php via fetch/AJAX
+                fetch('update_cart.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `cart_id=${cartId}&quantity=${currentQty}`
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log('Server response:', data);
+                        // Refresh halaman atau perbarui subtotal jika mau
+                        location.reload(); // atau update totalnya pakai JS
+                    })
+                    .catch(error => console.error('Error:', error));
             });
         });
     </script>

@@ -1,29 +1,34 @@
 <?php
 session_start();
-include '../koneksi.php';
+include 'koneksi.php';
 
-if (!isset($_SESSION['kd_cs'])) {
-    header("Location: login.php");
-    exit();
-}
+$cart_id = mysqli_real_escape_string($conn, $_POST['cart_id']);
+$quantity = (int) $_POST['quantity'];
+$customer_id = $_SESSION['kd_cs'] ?? null;
 
-if (isset($_POST['update_cart']) && isset($_POST['quantity'])) {
-    foreach ($_POST['quantity'] as $cart_id => $new_quantity) {
-        $cart_id = mysqli_real_escape_string($conn, $cart_id);
-        $new_quantity = (int)$new_quantity;
-        $customer_id = $_SESSION['kd_cs'];
-        
-        // Validasi quantity minimal 1
-        if ($new_quantity < 1) $new_quantity = 1;
-        
-        $update_query = "UPDATE carts SET jumlah_barang = '$new_quantity' 
-                         WHERE cart_id = '$cart_id' AND customer_id = '$customer_id'";
-        mysqli_query($conn, $update_query);
+// Cek stok
+$get_stok = mysqli_query($conn, "SELECT p.stok FROM products p 
+    JOIN carts c ON p.product_id = c.product_id 
+    WHERE c.cart_id = '$cart_id'");
+
+if ($get_stok && mysqli_num_rows($get_stok) > 0) {
+    $stok = mysqli_fetch_assoc($get_stok)['stok'];
+
+    if ($quantity > $stok) {
+        $_SESSION['alert'] = "Stok tidak mencukupi.";
+    } else {
+        $update = mysqli_query($conn, "UPDATE carts SET jumlah_barang = '$quantity' 
+            WHERE cart_id = '$cart_id' AND customer_id = '$customer_id'");
+
+        if ($update) {
+            $_SESSION['message'] = "Keranjang berhasil diperbarui.";
+        } else {
+            $_SESSION['alert'] = "Gagal memperbarui keranjang.";
+        }
     }
-    
-    $_SESSION['success_msg'] = "Cart updated successfully!";
+} else {
+    $_SESSION['alert'] = "Data produk tidak ditemukan.";
 }
 
-header("Location: cart.php");
-exit();
-?>
+exit(); // Jangan redirect karena dipanggil lewat fetch()
+
