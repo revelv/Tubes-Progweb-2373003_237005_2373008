@@ -6,7 +6,7 @@ include 'header_admin.php';
 if (isset($_GET['hapus'])) {
   $id = $_GET['hapus'];
   mysqli_query($conn, "DELETE FROM payments WHERE payment_id='$id'");
-  echo "<script>alert('Struk berhasil dihapus'); window.location='struk.php';</script>";
+  echo "<script>alert('Struk berhasil dihapus'); window.location='struk_admin.php';</script>";
 }
 
 // --- Ambil data untuk edit ---
@@ -31,22 +31,10 @@ if (isset($_POST['update'])) {
     jumlah_dibayar='$jumlah', 
     tanggal_bayar='$tanggal' 
     WHERE payment_id='$id'");
-  echo "<script>alert('Struk diperbarui'); window.location='struk.php';</script>";
+  echo "<script>alert('Struk diperbarui'); window.location='struk_admin.php';</script>";
 }
 
-// --- Tambah pembayaran baru ---
-if (isset($_POST['insert'])) {
-  $order_id = $_POST['order_id'];
-  $metode = $_POST['metode'];
-  $jumlah = $_POST['jumlah_dibayar'];
-  $tanggal = $_POST['tanggal_bayar'];
-
-  mysqli_query($conn, "INSERT INTO payments (order_id, metode, jumlah_dibayar, tanggal_bayar) VALUES 
-    ('$order_id', '$metode', '$jumlah', '$tanggal')");
-  echo "<script>alert('Struk berhasil ditambahkan'); window.location='struk.php';</script>";
-}
-
-// --- Filter ---
+// --- Filter pencarian ---
 $search = $_GET['search'] ?? '';
 
 // Query utama
@@ -73,7 +61,7 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Struk Pembayaran - Stryk Admin</title>
+  <title>History Pembayaran - Stryk Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
     @media print {
@@ -90,11 +78,9 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
 </head>
 
 <body class="bg-gray-900 text-white p-6">
+  <h1 class="text-2xl font-bold text-yellow-400 mb-6">History Pembayaran</h1>
 
-
-  <h1 class="text-2xl font-bold text-yellow-400 mb-6">Invoice</h1>
-
-  <!-- Filter -->
+  <!-- Filter pencarian -->
   <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 no-print">
     <div class="col-span-2">
       <input type="text" name="search" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" 
@@ -110,68 +96,63 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
     </div>
   </form>
 
-  <!-- Form Tambah/Edit -->
-  <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 no-print">
-    <h2 class="text-xl font-semibold text-yellow-400 mb-4">
-      <?= $edit ? "Edit Struk ID: {$edit['payment_id']}" : 'Tambah Struk Pembayaran' ?>
-    </h2>
-    
-    <form method="POST" class="space-y-4">
-      <?php if ($edit): ?>
+  <!-- Form Edit (Hanya muncul saat mode edit) -->
+  <?php if ($edit): ?>
+    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 no-print">
+      <h2 class="text-xl font-semibold text-yellow-400 mb-4">Edit Struk ID: <?= $edit['payment_id'] ?></h2>
+      
+      <form method="POST" class="space-y-4">
         <input type="hidden" name="payment_id" value="<?= $edit['payment_id'] ?>">
-      <?php endif; ?>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-gray-300 mb-1">ID Order</label>
-          <select name="order_id" required class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
-            <option value="">-- Pilih Order --</option>
-            <?php mysqli_data_seek($orders, 0); while ($o = mysqli_fetch_assoc($orders)) : ?>
-              <option value="<?= $o['order_id'] ?>" <?= ($edit && $edit['order_id'] == $o['order_id']) ? 'selected' : '' ?>>
-                <?= $o['order_id'] ?> - <?= $o['nama'] ?>
-              </option>
-            <?php endwhile; ?>
-          </select>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-300 mb-1">ID Order</label>
+            <select name="order_id" required class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+              <option value="">-- Pilih Order --</option>
+              <?php mysqli_data_seek($orders, 0); while ($o = mysqli_fetch_assoc($orders)) : ?>
+                <option value="<?= $o['order_id'] ?>" <?= ($edit['order_id'] == $o['order_id']) ? 'selected' : '' ?>>
+                  <?= $o['order_id'] ?> - <?= $o['nama'] ?>
+                </option>
+              <?php endwhile; ?>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-gray-300 mb-1">Metode Pembayaran</label>
+            <input type="text" name="metode" value="<?= $edit['metode'] ?>" required
+                   class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+          </div>
         </div>
         
-        <div>
-          <label class="block text-gray-300 mb-1">Metode Pembayaran</label>
-          <input type="text" name="metode" value="<?= $edit['metode'] ?? '' ?>" required
-                 class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
-        </div>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-gray-300 mb-1">Jumlah Dibayar</label>
-          <input type="number" name="jumlah_dibayar" value="<?= $edit['jumlah_dibayar'] ?? '' ?>" required
-                 class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-300 mb-1">Jumlah Dibayar</label>
+            <input type="number" name="jumlah_dibayar" value="<?= $edit['jumlah_dibayar'] ?>" required
+                   class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+          </div>
+          
+          <div>
+            <label class="block text-gray-300 mb-1">Tanggal Bayar</label>
+            <input type="datetime-local" name="tanggal_bayar" 
+                   value="<?= date('Y-m-d\TH:i', strtotime($edit['tanggal_bayar'])) ?>" required
+                   class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
+          </div>
         </div>
         
-        <div>
-          <label class="block text-gray-300 mb-1">Tanggal Bayar</label>
-          <input type="datetime-local" name="tanggal_bayar" 
-                 value="<?= isset($edit['tanggal_bayar']) ? date('Y-m-d\TH:i', strtotime($edit['tanggal_bayar'])) : '' ?>" required
-                 class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
-        </div>
-      </div>
-      
-      <div class="flex space-x-3 pt-2">
-        <button type="submit" name="<?= $edit ? 'update' : 'insert' ?>" 
-                class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-6 rounded">
-          <?= $edit ? 'Simpan Perubahan' : 'Tambah Struk' ?>
-        </button>
-        
-        <?php if ($edit): ?>
-          <a href="struk.php" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded">
+        <div class="flex space-x-3 pt-2">
+          <button type="submit" name="update" 
+                  class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-6 rounded">
+            Simpan Perubahan
+          </button>
+          <a href="struk_admin.php" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded">
             Batal
           </a>
-        <?php endif; ?>
-      </div>
-    </form>
-  </div>
+        </div>
+      </form>
+    </div>
+  <?php endif; ?>
 
-  <!-- Daftar Struk -->
+  <!-- Daftar Struk (History) -->
   <div class="space-y-4">
     <?php while ($row = mysqli_fetch_assoc($result)) : ?>
       <div class="bg-gray-800 rounded-lg shadow overflow-hidden struk-card" id="struk-<?= $row['payment_id'] ?>">
@@ -204,11 +185,11 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
             </div>
           </div>
           <div class="mt-4 flex space-x-2 no-print">
-            <a href="struk.php?edit=<?= $row['payment_id'] ?>" 
+            <a href="struk_admin.php?edit=<?= $row['payment_id'] ?>" 
                class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
               Edit
             </a>
-            <a href="struk.php?hapus=<?= $row['payment_id'] ?>" 
+            <a href="struk_admin.php?hapus=<?= $row['payment_id'] ?>" 
                onclick="return confirm('Yakin hapus struk ini?')"
                class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
               Hapus

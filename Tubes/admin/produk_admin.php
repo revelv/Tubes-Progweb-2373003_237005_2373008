@@ -240,9 +240,7 @@ $result = mysqli_query($conn, $query);
   </div>
 
   <?php if ($edit): ?>
-    <a href="produk_admin.php" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded">
-      Batal
-    </a>
+    <button onclick="window.location='produk_admin.php'" class="...">Batal</button>
   <?php endif; ?>
   </div>
   </form>

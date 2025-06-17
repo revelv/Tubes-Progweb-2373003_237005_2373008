@@ -11,7 +11,7 @@ if (isset($_GET['hapus'])) {
 
 // --- Ambil Data untuk Edit ---
 $edit = null;
-if (isset($_GET['edit'])) {
+if (isset($_GET['edit'])) { 
   $id = $_GET['edit'];
   $res = mysqli_query($conn, "SELECT * FROM customer WHERE customer_id='$id'");
   $edit = mysqli_fetch_assoc($res);
