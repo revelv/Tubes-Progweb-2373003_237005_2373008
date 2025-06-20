@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 17, 2025 at 07:08 PM
+-- Generation Time: Jun 20, 2025 at 04:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -58,7 +58,7 @@ CREATE TABLE `carts` (
 --
 
 INSERT INTO `carts` (`cart_id`, `customer_id`, `product_id`, `jumlah_barang`) VALUES
-(1, 6, 'KB002', 2),
+(1, 6, 'KB002', 5),
 (2, 6, 'KB001', 2);
 
 -- --------------------------------------------------------
@@ -79,7 +79,12 @@ CREATE TABLE `category` (
 
 INSERT INTO `category` (`category_id`, `category`, `deskripsi_category`) VALUES
 (1, 'Case', 'Casing dari Keyboard'),
-(2, 'Case', 'Casing dari Keyboard');
+(2, 'Keyboard', 'Keyboard'),
+(3, 'Keycaps', ''),
+(4, 'Keyboard_Kit', ''),
+(5, 'Keypad', ''),
+(6, 'Stabilizers', ''),
+(7, 'Switch_kit', '');
 
 -- --------------------------------------------------------
 
@@ -269,7 +274,7 @@ INSERT INTO `products` (`product_id`, `nama_produk`, `deskripsi_produk`, `harga`
 ('KK007', 'GMMK Pro Barebone', 'A 75% layout mechanical keyboard with a rotary knob and aluminum body.', 170.00, 170.00, 0, 10, 'Keyboard_Kit', 'https://i.postimg.cc/0NVd5s1b/20.jpg'),
 ('KK008', 'Tofu65 Kit', 'Aluminum 65% DIY keyboard kit with customizable options.', 170.00, 160.00, 1, 10, 'Keyboard_Kit', 'https://i.postimg.cc/m2Vr52Yz/28.jpg'),
 ('KK009', 'KBD75 V3 Kit', '75% aluminum keyboard with refined layout and features.', 185.00, 170.00, 1, 10, 'Keyboard_Kit', 'https://i.postimg.cc/Kjv6kFRw/48.jpg'),
-('KP001', 'Taco Pad', 'A novelty macropad shaped like a taco. Fun, quirky, and useful for macros, shortcuts, or artisan display. A must-have desk companion for enthusiasts.', 90.00, 90.00, 0, 10, 'keypad', 'https://i.postimg.cc/C5BzGCqG/3.jpg'),
+('KP001', 'Taco Pad', 'A novelty macropad shaped like a taco. Fun, quirky, and useful for macros, shortcuts, or artisan display. A must-have desk companion for enthusiasts.', 90.00, 90.00, 0, 10, 'Keypad', 'https://i.postimg.cc/C5BzGCqG/3.jpg'),
 ('ST001', 'Durock V2 Stabilizers', 'Premium screw-in stabilizers for mechanical keyboards.', 22.00, 20.00, 1, 10, 'Stabilizers', 'https://i.postimg.cc/g2nGtycQ/31.jpg'),
 ('SW001', 'Leopold FC660C', 'Topre electro-capacitive switches in a 65% layout.', 230.00, 210.00, 1, 10, 'Switch_kit', 'https://i.postimg.cc/pLGppXyb/24.jpg'),
 ('SW002', 'NovelKeys Cream Switches (70 pcs)', 'Smooth linear switches with self-lubricating POM housing.', 56.00, 56.00, 0, 10, 'Switch_kit', 'https://i.postimg.cc/jS5j00c8/29.jpg'),
@@ -350,13 +355,13 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `category`
 --
 ALTER TABLE `category`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `customer`
