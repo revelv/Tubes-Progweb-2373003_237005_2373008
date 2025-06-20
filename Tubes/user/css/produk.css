@@ -82,10 +82,6 @@
     padding: 15px;
     text-align: center;
 }
-
-.button {}
-
-
 .caption h3 {
     font-size: 18px;
     margin: 10px 0;
@@ -99,28 +95,10 @@
     margin: 5px 0;
 }
 
-/* Modal Styling */
-#detailModal .modal-content {
-    border-radius: 10px;
-    border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-}
-
-#detailModal .modal-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-    padding: 1.2rem 1.5rem;
-}
-
 #detailModal .modal-title {
     font-weight: 600;
     color: #333;
     font-family: 'Poppins', sans-serif;
-}
-
-#detailModal .modal-body {
-    padding: 2rem;
 }
 
 #detailModal .btn-close {
@@ -129,11 +107,17 @@
 
 /* Product Image */
 #modal-gambar {
+    max-width: 280px;      /* Ukuran seragam */
+    width: 100%;
+    height: auto;
+    object-fit: contain;   /* Hindari crop gambar aneh */
+    display: block;
+    margin: 0 auto 1.5rem auto; /* Tengah horizontal + jarak bawah */
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-    margin-bottom: 1.5rem;
 }
+
 
 #modal-gambar:hover {
     transform: scale(1.02);
@@ -204,81 +188,8 @@
     padding: 1.2rem 1.5rem;
 }
 
-#detailModal .modal-title {
-    font-weight: 600;
-    color: #333;
-    font-family: 'Poppins', sans-serif;
-}
-
 #detailModal .modal-body {
     padding: 2rem;
-}
-
-#detailModal .btn-close {
-    font-size: 0.8rem;
-}
-
-/* Product Image */
-#modal-gambar {
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    margin-bottom: 1.5rem;
-}
-
-#modal-gambar:hover {
-    transform: scale(1.02);
-}
-
-/* Product Info */
-#modal-nama {
-    font-family: 'Poppins', sans-serif;
-    color: #2c3e50;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-#detailModal p {
-    margin-bottom: 0.8rem;
-    font-size: 1rem;
-    color: #555;
-}
-
-#detailModal strong {
-    color: #333;
-    font-weight: 600;
-}
-
-/* Stock Indicator */
-#modal-stok {
-    display: inline-block;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 500;
-}
-
-/* Buttons */
-#modal-button-container .btn {
-    padding: 0.6rem 1.5rem;
-    font-weight: 500;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
-}
-
-#modal-button-container .btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-}
-
-#modal-button-container .btn-success:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-}
-
-#modal-button-container .btn-secondary {
-    background-color: #6c757d;
 }
 
 /* Audio Button */
@@ -324,4 +235,106 @@
 
 .modal.fade .modal-dialog {
     animation: modalFadeIn 0.3s ease-out;
+}
+
+/* Filter and Search Section Styles */
+.container_produk form {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.container_produk .row.g-3 {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0;
+}
+
+.container_produk .col-auto {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+#search{
+    margin-top: 14px;
+}
+
+.container_produk .col-form-label {
+    font-weight: 500;
+    color: #2e2a0d;
+    font-family: 'Poppins', sans-serif;
+    margin-right: 0.75rem;
+    white-space: nowrap;
+}
+
+.container_produk .form-select,
+.container_produk .form-control {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    height: auto;
+    min-width: 200px;
+    flex-grow: 1;
+}
+
+.container_produk .form-select {
+    padding-right: 2.5rem;
+}
+
+.container_produk .btn-primary {
+    background-color: #2e2a0d;
+    border-color: #2e2a0d;
+    padding: 0.75rem 1.75rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .container_produk .row.g-3 {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .container_produk .col-auto {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .container_produk .form-select,
+    .container_produk .form-control {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .container_produk .col-form-label {
+        margin-bottom: 0.5rem;
+        display: block;
+        width: 100%;
+    }
+}
+
+#modal-button-container .btn {
+    width: 200px;
+    max-width: 100%;
+    text-align: center;
+    display: inline-block;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.3s ease;
 }

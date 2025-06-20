@@ -1,6 +1,17 @@
 <?php
 include 'header.php';
 
+
+if (!isset($_SESSION['kd_cs'])) {
+    echo "<script>
+        alert('Anda belum login. Silakan login terlebih dahulu.');
+        window.location.href = 'produk.php';
+    </script>";
+    exit();
+}
+
+
+
 if (!isset($_SESSION['kd_cs'])) {
     header("Location: login.php");
     exit();
@@ -68,7 +79,7 @@ $total = 0;
                                         <button type="button" class="btn btn-outline-secondary btn-sm quantity-minus" data-id="<?= $row['cart_id']; ?>">-</button>
                                         <input type="number" name="quantity[<?= $row['cart_id']; ?>]"
                                             value="<?= $row['jumlah_barang']; ?>"
-                                            min="1" class="form-control text-center">
+                                            min="1" class="form-control text-center" readonly>
                                         <button type="button" class="btn btn-outline-secondary btn-sm quantity-plus" data-id="<?= $row['cart_id']; ?>">+</button>
                                     </div>
                                 </td>
@@ -91,9 +102,6 @@ $total = 0;
                 </table>
 
                 <div class="text-end">
-                    <button type="submit" name="update_cart" class="btn btn-primary">
-                        <i class="bi bi-arrow-repeat"></i> Update Cart
-                    </button>
                     <a href="checkout.php" class="btn btn-success">
                         <i class="bi bi-credit-card"></i> Checkout
                     </a>
@@ -106,8 +114,6 @@ $total = 0;
 
     <!-- JavaScript untuk tombol +/- -->
     <script>
- 
-
         document.querySelectorAll('.quantity-plus, .quantity-minus').forEach(button => {
             button.addEventListener('click', function() {
                 const input = this.parentElement.querySelector('input');

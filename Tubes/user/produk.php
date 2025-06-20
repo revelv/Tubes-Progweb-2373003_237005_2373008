@@ -11,20 +11,73 @@ include 'header.php';
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
 	<!-- Bootstrap CSS -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	<!-- Bootstrap JS (Popper included) -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<title>Styrk Industries</title>
 </head>
 
 <body>
+
+	<script>
+		const isLoggedIn = <?= isset($_SESSION['kd_cs']) ? 'true' : 'false'; ?>;
+	</script>
+
 	<div class="container_produk">
 		<h2 id="judul">Our Products</h2>
+	</div>
+
+	<div class="container_produk mb-4">
+		<form method="GET" class="row g-3 align-items-center">
+			<div class="col-auto">
+				<label for="kategori" class="col-form-label">Filter by Category:</label>
+			</div>
+			<div class="col-auto">
+				<select name="kategori" id="kategori" class="form-select">
+					<option value="">All Categories</option>
+					<?php
+					$kategori_result = mysqli_query($conn, "SELECT DISTINCT category FROM category");
+					while ($kategori = mysqli_fetch_assoc($kategori_result)) {
+						$selected = (isset($_GET['kategori']) && $_GET['kategori'] == $kategori['category']) ? 'selected' : '';
+						echo "<option value=\"" . htmlspecialchars($kategori['category'], ENT_QUOTES) . "\" $selected>" . htmlspecialchars($kategori['category']) . "</option>";
+					}
+					?>
+				</select>
+			</div>
+
+			<div class="col-auto">
+				<label for="search" class="col-form-label">Search Product:</label>
+			</div>
+
+			<div class="col-auto">
+				<input type="text" name="search" id="search" class="form-control" value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
+			</div>
+
+			<div class="col-auto">
+				<button type="submit" class="btn btn-primary">Filter & Search</button>
+			</div>
+		</form>
 	</div>
 
 	<div class="container_produk">
 		<div class="row">
 			<?php
-			$result = mysqli_query($conn, "SELECT * FROM products");
+			$where = [];
+
+			if (!empty($_GET['kategori'])) {
+				$kategori = mysqli_real_escape_string($conn, $_GET['kategori']);
+				$where[] = "category = '$kategori'";
+			}
+
+			if (!empty($_GET['search'])) {
+				$search = mysqli_real_escape_string($conn, $_GET['search']);
+				$where[] = "nama_produk LIKE '%$search%'";
+			}
+
+			$where_clause = '';
+			if (count($where) > 0) {
+				$where_clause = 'WHERE ' . implode(' AND ', $where);
+			}
+
+			$result = mysqli_query($conn, "SELECT * FROM products $where_clause");
+
 			while ($row = mysqli_fetch_assoc($result)) {
 			?>
 				<div class="col-sm-6 col-md-4">
@@ -43,12 +96,11 @@ include 'header.php';
 							<img id="gambar" src="<?= $row['link_gambar']; ?>" alt="<?= $row['nama_produk']; ?>">
 						</a>
 
-
-
 						<div class="caption">
 							<h3><?= $row['nama_produk']; ?></h3>
 							<h4>$<?= $row['harga']; ?></h4>
 						</div>
+
 						<div class="button">
 							<?php
 							$stok = (int)$row['stok'];
@@ -90,9 +142,9 @@ include 'header.php';
 					<h5 class="modal-title" id="detailModalLabel">Detail Produk</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body d-flex flex-wrap">
+				<div class="modal-body d-flex flex-column align-items-center text-center">
 					<div class="me-4">
-						<img id="modal-gambar" src="" alt="gambar" style="max-width: 300px;">
+						<img id="modal-gambar" src="" alt="gambar">
 					</div>
 					<div>
 						<h4 id="modal-nama"></h4>
@@ -100,23 +152,19 @@ include 'header.php';
 						<p><strong>Stok:</strong> <span id="modal-stok"></span></p>
 						<p id="modal-deskripsi"></p>
 						<div id="modal-button-container" class="mt-3"></div>
-					</div>
-					<!-- Tombol Audio -->
-					<!-- Audio controls gabungan -->
-					<div id="modal-audio-container" class="mt-3" style="display: none;">
-						<button id="toggle-audio" class="btn btn-primary">
-							▶️ Play Sound
-						</button>
-						<audio id="product-audio" hidden></audio>
-					</div>
 
-
+						<!-- Tombol Audio -->
+						<div id="modal-audio-container" class="mt-3" style="display: none;">
+							<button id="toggle-audio" class="btn btn-primary">
+								▶️ Play Sound
+							</button>
+							<audio id="product-audio" hidden></audio>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-
 
 	<script>
 		document.querySelectorAll('.product-detail').forEach(el => {
@@ -136,11 +184,16 @@ include 'header.php';
 				document.getElementById('modal-deskripsi').textContent = deskripsi;
 				document.getElementById('modal-gambar').src = gambar;
 
-				// Tombol Add/SOLD OUT
+				// Tombol Add/SOLD OUT + LOGIN TO ADD
 				const container = document.getElementById('modal-button-container');
 				container.innerHTML = '';
+
 				if (parseInt(stok) > 0) {
-					container.innerHTML = `<a href="add_to_cart.php?product_id=${id}" class="btn btn-success">Add to Cart</a>`;
+					if (isLoggedIn) {
+						container.innerHTML = `<a href="add_to_cart.php?product_id=${id}" class="btn btn-success">Add to Cart</a>`;
+					} else {
+						container.innerHTML = `<a href="login.php" class="btn btn-warning">Login to Add</a>`;
+					}
 				} else {
 					container.innerHTML = `<button class="btn btn-secondary" disabled>SOLD OUT</button>`;
 				}
@@ -187,9 +240,6 @@ include 'header.php';
 			};
 		});
 	</script>
-
-
-
 
 </body>
 

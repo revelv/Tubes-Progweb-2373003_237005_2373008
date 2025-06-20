@@ -21,7 +21,7 @@ if ($get_stok && mysqli_num_rows($get_stok) > 0) {
             WHERE cart_id = '$cart_id' AND customer_id = '$customer_id'");
 
         if ($update) {
-            $_SESSION['message'] = "Keranjang berhasil diperbarui.";
+           
         } else {
             $_SESSION['alert'] = "Gagal memperbarui keranjang.";
         }
