@@ -21,31 +21,15 @@ $total = 0;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/payment.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        .qris-timer {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: red;
-        }
-
-        .payment-box {
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-        }
-    </style>
 </head>
 
 <body class="container mt-4">
 
     <!-- Back to Cart Button -->
-    <div class="mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="m-0">Checkout - Payment</h2>
         <a href="cart.php" class="btn btn-secondary">← Back to Cart</a>
     </div>
-
-    <h2>Checkout - Payment</h2>
 
     <!-- Daftar Produk -->
     <div class="mb-4">
@@ -70,8 +54,8 @@ $total = 0;
                         <td><img src="<?= $row['link_gambar']; ?>" width="80"></td>
                         <td><?= $row['nama_produk']; ?></td>
                         <td><?= $row['jumlah_barang']; ?></td>
-                        <td>Rp <?= number_format($harga, 0, ',', '.'); ?></td>
-                        <td>Rp <?= number_format($subtotal, 0, ',', '.'); ?></td>
+                        <td>$ <?= number_format($harga, 0, ',', '.'); ?></td>
+                        <td>$ <?= number_format($subtotal, 0, ',', '.'); ?></td>
                     </tr>
                 <?php endwhile; ?>
                 <?php
@@ -80,40 +64,54 @@ $total = 0;
                 ?>
                 <tr>
                     <td colspan="4" class="text-end"><strong>Ongkir (1%)</strong></td>
-                    <td>Rp <?= number_format($ongkir, 0, ',', '.'); ?></td>
+                    <td>$ <?= number_format($ongkir, 0, ',', '.'); ?></td>
                 </tr>
                 <tr>
                     <td colspan="4" class="text-end"><strong>Total</strong></td>
-                    <td><strong>Rp <?= number_format($grand_total, 0, ',', '.'); ?></strong></td>
+                    <td><strong>$ <?= number_format($grand_total, 0, ',', '.'); ?></strong></td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <!-- Pilihan Metode Pembayaran -->
-    <div class="mb-3">
-        <h4>Pilih Metode Pembayaran</h4>
-        <div>
-            <input type="radio" name="metode" id="qris" value="QRIS">
-            <label for="qris">QRIS</label>
-        </div>
-        <div>
-            <input type="radio" name="metode" id="transfer" value="Transfer">
-            <label for="transfer">Transfer Bank</label>
+    <div class="mb-4">
+        <h4 class="mb-3 text-center">Pilih Metode Pembayaran</h4>
+        <div class="payment-methods justify-content-center">
+            <div class="payment-option">
+                <input type="radio" name="metode" id="qris" value="QRIS" class="payment-input">
+                <label for="qris" class="payment-label">
+                    <div class="payment-content">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png" alt="QRIS" class="payment-icon">
+                        <span>QRIS</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="payment-option">
+                <input type="radio" name="metode" id="transfer" value="Transfer" class="payment-input">
+                <label for="transfer" class="payment-label">
+                    <div class="payment-content">
+                        <img src="./css/bca_logo.png" alt="Transfer Bank" class="payment-icon">
+                        <span>Transfer Bank</span>
+                    </div>
+                </label>
+            </div>
         </div>
     </div>
+
+    <!-- Area Tampilan Pembayaran -->
+    <div id="paymentContainer"></div>
 
     <!-- Tombol Pay -->
     <div class="text-center mb-4">
         <button class="btn btn-lg btn-warning" onclick="mulaiPembayaran()">Pay</button>
     </div>
 
-    <!-- Area Tampilan Pembayaran -->
-    <div id="paymentContainer"></div>
-
     <!-- Script -->
     <script>
-        let timerStarted = false;
+        let qrTimer, qrContent = "", paymentChecked = false;
+        const grandTotal = <?= $grand_total ?>;
 
         function mulaiPembayaran() {
             const metode = document.querySelector('input[name="metode"]:checked');
@@ -130,59 +128,33 @@ $total = 0;
                 qrContent = generateQRContent();
                 html += `
                 <div class="payment-box">
-      <h5>QRIS</h5>
-      <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qrContent}" alt="QRIS"><br>
-      <div class="qris-timer" id="timer">02:00</div>
-      <button onclick="cekPembayaran('QRIS')" class="btn btn-primary mt-2">Cek Pembayaran</button>
-    </div>
-  `;
+                    <h5>QRIS</h5>
+                    <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qrContent}" alt="QRIS"><br>
+                    <div class="qris-timer" id="timer">02:00</div>
+                    <form action="checkout.php" method="post">
+                        <input type="hidden" name="metode" value="QRIS">
+                        <input type="hidden" name="total" value="${grandTotal}">
+                        <input type="hidden" name="kode_transaksi" value="${qrContent}">
+                        <button type="submit" class="btn btn-primary mt-2">Cek Pembayaran</button>
+                    </form>
+                </div>`;
                 container.innerHTML = html;
                 startQRISTimer();
             } else if (metode.value === "Transfer") {
                 html += `
-          <div class="payment-box">
-            <h5>Transfer Bank</h5>
-            <p>Silakan transfer ke rekening:</p>
-            <p><strong>BANK BCA 1234567890 a.n STYRK INDUSTRIES</strong></p>
-            <form action="upload_bukti.php" method="post" enctype="multipart/form-data">
-              <label for="bukti">Upload Bukti Transfer</label>
-              <input type="file" name="bukti" class="form-control mb-2" required>
-              <button type="submit" class="btn btn-success">Upload & Cek Pembayaran</button>
-            </form>
-          </div>
-        `;
+                <div class="payment-box">
+                    <h5>Transfer Bank</h5>
+                    <p>Silakan transfer ke rekening:</p>
+                    <p><strong>BANK BCA 1234567890 a.n STYRK INDUSTRIES</strong></p>
+                    <form action="upload_bukti.php" method="post" enctype="multipart/form-data">
+                        <label for="bukti">Upload Bukti Transfer</label>
+                        <input type="file" name="bukti" class="form-control mb-2" required>
+                        <button type="submit" class="btn btn-success">Upload & Cek Pembayaran</button>
+                    </form>
+                </div>`;
                 container.innerHTML = html;
             }
         }
-
-        function startTimer() {
-            if (timerStarted) return;
-            timerStarted = true;
-
-            let duration = 120;
-            const timerDisplay = document.getElementById("timer");
-
-            const countdown = setInterval(() => {
-                const minutes = Math.floor(duration / 60);
-                const seconds = duration % 60;
-                timerDisplay.textContent =
-                    (minutes < 10 ? "0" : "") + minutes + ":" +
-                    (seconds < 10 ? "0" : "") + seconds;
-
-                if (--duration < 0) {
-                    clearInterval(countdown);
-                    timerDisplay.textContent = "00:00";
-                    alert("Waktu QRIS habis. Silakan ulangi pembayaran.");
-                }
-            }, 1000);
-        }
-
-        function cekPembayaran(metode) {
-            alert("Cek status pembayaran metode: " + metode + " (simulasi)");
-        }
-
-        let qrTimer, qrContent = "",
-            paymentChecked = false;
 
         function generateQRContent() {
             const randomCode = "ORDER" + Date.now() + Math.floor(Math.random() * 1000);
@@ -190,9 +162,8 @@ $total = 0;
         }
 
         function startQRISTimer() {
-            clearInterval(qrTimer); // pastikan tidak double timer
+            clearInterval(qrTimer);
             paymentChecked = false;
-            timerStarted = true;
 
             let duration = 120;
             const timerDisplay = document.getElementById("timer");
@@ -206,24 +177,13 @@ $total = 0;
 
                 if (--duration < 0) {
                     clearInterval(qrTimer);
-
-                    if (!paymentChecked) {
-                        // Generate ulang QR
-                        qrContent = generateQRContent();
-                        document.getElementById("qrImage").src =
-                            "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + qrContent;
-
-                        // Mulai ulang timer
-                        startQRISTimer();
-                        alert("QR baru telah digenerate karena belum ada konfirmasi pembayaran.");
-                    }
+                    qrContent = generateQRContent();
+                    document.getElementById("qrImage").src =
+                        "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + qrContent;
+                    startQRISTimer();
+                    alert("QR baru telah digenerate karena belum ada konfirmasi pembayaran.");
                 }
             }, 1000);
-        }
-
-        function cekPembayaran(metode) {
-            paymentChecked = true;
-            alert("Cek status pembayaran metode: " + metode + " (simulasi)");
         }
     </script>
 

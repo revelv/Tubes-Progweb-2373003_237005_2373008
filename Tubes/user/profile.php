@@ -77,15 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile - Styrk Industries</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
 
+    <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
             color: var(--black);
-
         }
 
         .profile-container {
@@ -96,8 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 30px;
         }
 
-
-
         .profile-title {
             font-size: 28px;
             font-weight: 600;
@@ -107,8 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .btn-save {
             background-color: var(--primary-yellow);
-            color: white;
-            font-weight: 500;
+            color: black;
+            font-weight: 700;
         }
 
         .btn-save:hover {
@@ -117,10 +112,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-cancel {
-            background-color: var(--light-gray);
-            color: var(--black);
-            font-weight: 500;
+            background-color: red;
+            color: white;
+            font-weight: 700;
             margin-right: 10px;
+
+        }
+
+        .btn-cancel:hover {
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
+            transform: scale(1.02);
         }
 
         .form-control:disabled {
@@ -139,21 +140,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #721c24;
             border-color: #f5c6cb;
         }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 
 <body>
-
-
     <!-- Main Content -->
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="profile-container">
-                    <div class="profile-header">
+                    <div class="profile-header d-flex justify-content-between align-items-center mb-4">
                         <h1 class="profile-title">Edit Profile</h1>
-                        <a href="profile.php" class="btn btn-cancel">
-                            <i class="bi bi-arrow-left me-2"></i>Cancel
+                        <a href="produk.php" class="btn btn-cancel">
+                            <i class="bi bi-arrow-left me-2"></i>Back
                         </a>
                     </div>
 
@@ -211,7 +217,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Validasi nomor telepon sebelum submit
         document.querySelector('form').addEventListener('submit', function(e) {

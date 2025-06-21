@@ -1,0 +1,105 @@
+/* General Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+    color: #333333;
+    margin: 0;
+ 
+}
+
+#status{
+    color: rgb(102, 175, 0);
+}
+
+h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #000000;
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 30px;
+    font-size: 36px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.order-card {
+    background-color: #ffffff;
+    border: 1px solid #d4af37; /* Gold border */
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.order-header {
+    font-weight: 600;
+    color: #000000;
+    border-bottom: 2px solid #d4af37; /* Gold accent */
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.product-item {
+    font-size: 16px;
+    color: #555555;
+    margin: 10px 0;
+    padding: 10px;
+    border-left: 4px solid #d4af37; /* Gold accent */
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+.tracking-log {
+    margin-top: 20px;
+    
+}
+
+.tracking-log h4 {
+    font-weight: 600;
+    color: #000000;
+    font-size: 18px;
+    margin-bottom: 10px;
+    
+}
+
+.tracking-log p {
+    font-size: 14px;
+    color: #777777;
+    margin: 5px 0;
+    color: rgb(102, 175, 0);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 28px;
+    }
+
+    .order-card {
+        padding: 15px;
+    }
+
+    .order-header {
+        font-size: 16px;
+    }
+
+    .product-item {
+        font-size: 14px;
+    }
+
+    .tracking-log h4 {
+        font-size: 16px;
+    }
+}

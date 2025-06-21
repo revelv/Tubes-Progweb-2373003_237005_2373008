@@ -102,7 +102,7 @@ $total = 0;
                 </table>
 
             </form>
-            <form action="checkout.php">
+            <form action="payment.php">
                 <div class="text-end">
                     <button type="submit" name="proceedd_payment" class="btn btn-success">
                         <i class="bi bi-credit-card"></i> Checkout

@@ -100,7 +100,7 @@ if (isset($_GET['logout'])) {
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person-circle me-2"></i>Profil Saya</a></li>
-                                <li><a class="dropdown-item" href="order_history.php"><i class="bi bi-receipt me-2"></i>Riwayat Belanja</a></li>
+                                <li><a class="dropdown-item" href="riwayat_belanja.php"><i class="bi bi-receipt me-2"></i>Riwayat Belanja</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="?logout=1"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
                             </ul>
