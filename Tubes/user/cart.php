@@ -101,10 +101,12 @@ $total = 0;
                     </tfoot>
                 </table>
 
+            </form>
+            <form action="checkout.php">
                 <div class="text-end">
-                    <a href="checkout.php" class="btn btn-success">
+                    <button type="submit" name="proceedd_payment" class="btn btn-success">
                         <i class="bi bi-credit-card"></i> Checkout
-                    </a>
+                    </button>
                 </div>
             </form>
         <?php else: ?>
