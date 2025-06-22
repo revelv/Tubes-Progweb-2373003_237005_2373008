@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 20, 2025 at 04:07 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Host: localhost:3306
+-- Generation Time: Jun 22, 2025 at 11:36 AM
+-- Server version: 8.4.3
+-- PHP Version: 8.3.16
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,9 +28,9 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admin` (
-  `admin_id` int(11) NOT NULL,
-  `username` varchar(200) NOT NULL,
-  `password` text NOT NULL
+  `admin_id` int NOT NULL,
+  `username` varchar(200) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` text COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -47,10 +47,10 @@ INSERT INTO `admin` (`admin_id`, `username`, `password`) VALUES
 --
 
 CREATE TABLE `carts` (
-  `cart_id` int(11) NOT NULL,
-  `customer_id` int(11) NOT NULL,
-  `product_id` varchar(10) NOT NULL,
-  `jumlah_barang` int(11) NOT NULL
+  `cart_id` int NOT NULL,
+  `customer_id` int NOT NULL,
+  `product_id` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  `jumlah_barang` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -68,9 +68,9 @@ INSERT INTO `carts` (`cart_id`, `customer_id`, `product_id`, `jumlah_barang`) VA
 --
 
 CREATE TABLE `category` (
-  `category_id` int(11) NOT NULL,
-  `category` varchar(100) NOT NULL,
-  `deskripsi_category` text NOT NULL
+  `category_id` int NOT NULL,
+  `category` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `deskripsi_category` text COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -93,12 +93,12 @@ INSERT INTO `category` (`category_id`, `category`, `deskripsi_category`) VALUES
 --
 
 CREATE TABLE `customer` (
-  `customer_id` int(11) NOT NULL,
-  `nama` varchar(100) NOT NULL,
-  `password` text NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `no_telepon` varchar(20) NOT NULL,
-  `alamat` text NOT NULL
+  `customer_id` int NOT NULL,
+  `nama` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` text COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `no_telepon` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `alamat` text COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -117,11 +117,11 @@ INSERT INTO `customer` (`customer_id`, `nama`, `password`, `email`, `no_telepon`
 --
 
 CREATE TABLE `orders` (
-  `order_id` int(11) NOT NULL,
-  `customer_id` int(11) NOT NULL,
+  `order_id` int NOT NULL,
+  `customer_id` int NOT NULL,
   `tgl_order` datetime NOT NULL,
   `total_harga` decimal(12,2) NOT NULL,
-  `status` varchar(20) NOT NULL
+  `status` varchar(20) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -129,7 +129,10 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `customer_id`, `tgl_order`, `total_harga`, `status`) VALUES
-(2, 5, '2025-06-10 15:33:00', 0.00, 'proses');
+(2, 5, '2025-06-10 15:33:00', 0.00, 'proses'),
+(3, 7, '2025-06-22 10:49:02', 430.00, 'proses'),
+(4, 7, '2025-06-22 11:31:15', 297.95, 'pending'),
+(5, 7, '2025-06-22 11:35:31', 297.95, 'pending');
 
 -- --------------------------------------------------------
 
@@ -138,13 +141,25 @@ INSERT INTO `orders` (`order_id`, `customer_id`, `tgl_order`, `total_harga`, `st
 --
 
 CREATE TABLE `order_details` (
-  `detail_id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `product_id` varchar(10) NOT NULL,
-  `jumlah` int(11) NOT NULL,
+  `detail_id` int NOT NULL,
+  `order_id` int NOT NULL,
+  `product_id` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  `jumlah` int NOT NULL,
   `harga_satuan` decimal(12,2) NOT NULL,
   `subtotal` decimal(12,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_details`
+--
+
+INSERT INTO `order_details` (`detail_id`, `order_id`, `product_id`, `jumlah`, `harga_satuan`, `subtotal`) VALUES
+(1, 3, 'KB003', 1, 250.00, 250.00),
+(2, 3, 'KB001', 1, 180.00, 180.00),
+(3, 4, 'KB001', 1, 180.00, 180.00),
+(4, 4, 'CS001', 1, 115.00, 115.00),
+(5, 5, 'KB001', 1, 180.00, 180.00),
+(6, 5, 'CS001', 1, 115.00, 115.00);
 
 -- --------------------------------------------------------
 
@@ -153,11 +168,11 @@ CREATE TABLE `order_details` (
 --
 
 CREATE TABLE `order_tracking` (
-  `tracking_id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `status` varchar(100) NOT NULL,
-  `description` text DEFAULT NULL,
-  `timestamp` datetime DEFAULT current_timestamp()
+  `tracking_id` int NOT NULL,
+  `order_id` int NOT NULL,
+  `status` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
+  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -200,12 +215,21 @@ INSERT INTO `order_tracking` (`tracking_id`, `order_id`, `status`, `description`
 --
 
 CREATE TABLE `payments` (
-  `payment_id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `metode` varchar(100) NOT NULL,
+  `payment_id` int NOT NULL,
+  `order_id` int NOT NULL,
+  `metode` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `jumlah_dibayar` decimal(12,2) NOT NULL,
-  `tanggal_bayar` datetime NOT NULL
+  `tanggal_bayar` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `payment_proof` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `payment_status` varchar(20) COLLATE utf8mb4_general_ci DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`payment_id`, `order_id`, `metode`, `jumlah_dibayar`, `tanggal_bayar`, `payment_proof`, `payment_status`) VALUES
+(1, 5, 'Transfer Bank', 297.95, '2025-06-22 11:35:31', '../payment_proofs/proof_5_1750592131.jpg', 'pending');
 
 -- --------------------------------------------------------
 
@@ -214,15 +238,15 @@ CREATE TABLE `payments` (
 --
 
 CREATE TABLE `products` (
-  `product_id` varchar(10) NOT NULL,
-  `nama_produk` varchar(100) NOT NULL,
-  `deskripsi_produk` text NOT NULL,
+  `product_id` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  `nama_produk` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `deskripsi_produk` text COLLATE utf8mb4_general_ci NOT NULL,
   `harga` decimal(12,2) NOT NULL,
   `harga_diskon` decimal(12,2) NOT NULL,
   `status_diskon` tinyint(1) NOT NULL,
-  `stok` int(11) NOT NULL,
-  `category` varchar(20) NOT NULL,
-  `link_gambar` varchar(300) NOT NULL
+  `stok` int NOT NULL,
+  `category` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `link_gambar` varchar(300) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -230,10 +254,10 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`product_id`, `nama_produk`, `deskripsi_produk`, `harga`, `harga_diskon`, `status_diskon`, `stok`, `category`, `link_gambar`) VALUES
-('CS001', 'Tofu60 Redux Case', 'An upgraded version of the classic Tofu60 case, offering improved materials, finish, and design features. Compatible with a wide range of 60% PCBs and plates.', 115.00, 115.00, 0, 10, 'Case', 'https://i.postimg.cc/T1D3LRzQ/11.jpg'),
-('KB001', 'Sirius Manta', 'A premium mechanical keyboard known for its elegant design and smooth typing experience. The Sirius Manta blends aesthetics with functionality, making it a favorite among hobbyists.', 200.00, 180.00, 1, 10, 'Keyboard', 'https://i.postimg.cc/zfxB42ww/10.jpg'),
+('CS001', 'Tofu60 Redux Case', 'An upgraded version of the classic Tofu60 case, offering improved materials, finish, and design features. Compatible with a wide range of 60% PCBs and plates.', 115.00, 115.00, 0, 8, 'Case', 'https://i.postimg.cc/T1D3LRzQ/11.jpg'),
+('KB001', 'Sirius Manta', 'A premium mechanical keyboard known for its elegant design and smooth typing experience. The Sirius Manta blends aesthetics with functionality, making it a favorite among hobbyists.', 200.00, 180.00, 1, 7, 'Keyboard', 'https://i.postimg.cc/zfxB42ww/10.jpg'),
 ('KB002', 'Snake60 R2', 'A high-end 60% keyboard kit with sleek lines and robust build quality. The Snake60 R2 delivers a refined typing experience and top-tier customization options at a heavily discounted price.', 500.00, 250.00, 1, 10, 'Keyboard', 'https://i.postimg.cc/L5chNqtr/2.jpg'),
-('KB003', 'KBD8X MKIII Keyboard', 'A beloved full-sized mechanical keyboard featuring top mount design and premium aluminum construction. Now at half price, it\'s a steal for serious keyboard builders.', 500.00, 250.00, 1, 10, 'Keyboard', 'https://i.postimg.cc/JnhynC7d/4.jpg'),
+('KB003', 'KBD8X MKIII Keyboard', 'A beloved full-sized mechanical keyboard featuring top mount design and premium aluminum construction. Now at half price, it\'s a steal for serious keyboard builders.', 500.00, 250.00, 1, 9, 'Keyboard', 'https://i.postimg.cc/JnhynC7d/4.jpg'),
 ('KB004', 'Magnum65', 'A 65% layout keyboard with a bold design and exceptional build quality. The Magnum65 is for those who want a compact form factor without compromising on performance.', 80.00, 280.00, 0, 10, 'Keyboard', 'https://i.postimg.cc/sfqBVLkw/5.jpg'),
 ('KB005', 'Quartz Stone Wrist Rest', 'A solid quartz wrist rest designed to offer comfort and elegance. Its cool, stone finish adds a premium touch to your keyboard setup.', 40.00, 40.00, 0, 10, 'Keyboard', 'https://i.postimg.cc/jSQC4SLF/7.jpg'),
 ('KB006', 'Odin 75 Hot-swap Keyboard with PBTfans Courage red', 'A ready-to-use Odin 75 keyboard with bold Courage Red keycaps. Hot-swap sockets make switch swapping easy without soldering.', 358.30, 394.00, 0, 10, 'Keyboard', 'https://i.postimg.cc/bwH9Mn60/17.jpg'),
@@ -349,43 +373,43 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `admin_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `cart_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `category`
 --
 ALTER TABLE `category`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `category_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `customer_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `detail_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `detail_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `payment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
