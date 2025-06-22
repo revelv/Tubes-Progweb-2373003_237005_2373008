@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['pay_bank'])) {
         // Bank transfer processing
         $customer_id = $_SESSION['kd_cs'];
-        
+
         // Get cart items to calculate total
         $query = "SELECT carts.*, products.harga, products.harga_diskon, products.stok 
                 FROM carts 
@@ -17,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $total = 0;
         $cart_items = [];
-        
+
         while ($row = mysqli_fetch_assoc($result)) {
-            $harga = ($row['harga_diskon'] > 0) ? $row['harga_diskon'] : $row['harga'];
+            $harga = $row['harga']; // Ambil harga normal, abaikan diskon
             $subtotal = $harga * $row['jumlah_barang'];
             $total += $subtotal;
-            
+
             // Check stock
             if ($row['stok'] < $row['jumlah_barang']) {
                 die("Stok untuk produk {$row['product_id']} tidak mencukupi.");
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'subtotal' => $subtotal
             ];
         }
-        
+
         $ongkir = $total * 0.01;
         $grand_total = $total + $ongkir;
 
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql_detail = "INSERT INTO order_details (order_id, product_id, jumlah, harga_satuan, subtotal) 
                         VALUES ('$order_id', '{$item['product_id']}', '{$item['jumlah']}', '{$item['harga']}', '{$item['subtotal']}')";
             mysqli_query($conn, $sql_detail);
-            
+
             $sql_update = "UPDATE products SET stok = stok - {$item['jumlah']} WHERE product_id = '{$item['product_id']}'";
             mysqli_query($conn, $sql_update);
         }
@@ -60,44 +60,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle payment proof upload
         if (isset($_FILES['bukti']) && $_FILES['bukti']['error'] === UPLOAD_ERR_OK) {
             $target_dir = "../payment_proofs/";
-            
+
             // Create directory if not exists
             if (!file_exists($target_dir)) {
                 mkdir($target_dir, 0755, true);
             }
-            
+
             // Generate unique filename
             $file_ext = pathinfo($_FILES['bukti']['name'], PATHINFO_EXTENSION);
             $new_filename = "proof_" . $order_id . "_" . time() . "." . $file_ext;
             $target_file = $target_dir . $new_filename;
-            
+
             // Validate file
             $check = getimagesize($_FILES['bukti']['tmp_name']);
             if ($check === false) {
                 die("File bukan gambar.");
             }
-            
+
             // Check file size (max 2MB)
-            if ($_FILES['bukti']['size'] > 2000000) {
+            if ($_FILES['bukti']['size'] > 20000000) {
                 die("Ukuran file terlalu besar (max 2MB).");
             }
-            
+
             // Allow only certain formats
             $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
             if (!in_array(strtolower($file_ext), $allowed_ext)) {
                 die("Hanya format JPG, JPEG, PNG & GIF yang diperbolehkan.");
             }
-            
+
             // Move file to directory
             if (move_uploaded_file($_FILES['bukti']['tmp_name'], $target_file)) {
                 // Record payment
                 $sql_payment = "INSERT INTO payments (order_id, metode, jumlah_dibayar, tanggal_bayar, payment_proof, payment_status) 
                                 VALUES ('$order_id', 'Transfer Bank', '$grand_total', '$tanggal', '$target_file', 'pending')";
                 mysqli_query($conn, $sql_payment);
-                
+
                 // Clear cart
                 mysqli_query($conn, "DELETE FROM carts WHERE customer_id = '$customer_id'");
-                
+
                 // Show success message
                 echo "<script>
                     alert('Upload bukti pembayaran berhasil! Pesanan Anda akan diproses setelah verifikasi.');
@@ -158,8 +158,14 @@ $total = 0;
                 </tr>
             </thead>
             <tbody>
-                <?php while ($row = mysqli_fetch_assoc($result)) :
-                    $harga = ($row['harga_diskon'] > 0) ? $row['harga_diskon'] : $row['harga'];
+                <?php
+                // Reset pointer result karena result sudah dipakai sebelumnya
+                mysqli_data_seek($result, 0);
+                $total = 0; // Reset total
+
+                while ($row = mysqli_fetch_assoc($result)) :
+                    // PERBAIKAN: Cek harga_diskon > 0, bukan harga > 0
+                    $harga = $row['harga']; // Ambil harga normal, abaikan diskon
                     $subtotal = $harga * $row['jumlah_barang'];
                     $total += $subtotal;
                 ?>
@@ -224,7 +230,7 @@ $total = 0;
                 <div class="mb-3">
                     <label for="bukti" class="form-label">Upload Bukti Transfer</label>
                     <input type="file" name="bukti" class="form-control" required accept="image/*">
-                    <div class="form-text">Format: JPG, PNG (max 2MB)</div>
+                    <div class="form-text">Format: JPG, PNG (max 10MB)</div>
                 </div>
                 <button type="submit" name="pay_bank" class="btn btn-success w-100">
                     <i class="fas fa-upload me-2"></i> Upload & Cek Pembayaran
@@ -240,7 +246,8 @@ $total = 0;
 
     <!-- Script -->
     <script>
-        let qrTimer, qrContent = "", paymentChecked = false;
+        let qrTimer, qrContent = "",
+            paymentChecked = false;
         const grandTotal = <?= $grand_total ?>;
 
         function mulaiPembayaran() {
@@ -322,4 +329,5 @@ $total = 0;
         }
     </script>
 </body>
+
 </html>
