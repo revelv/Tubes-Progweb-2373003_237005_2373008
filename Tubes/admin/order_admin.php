@@ -54,6 +54,21 @@ if (isset($_POST['update_status'])) {
   echo "<script>alert('Status order diperbarui'); window.location='order_admin.php';</script>";
 }
 
+// --- Update Payment Status ---
+if (isset($_POST['update_payment_status'])) {
+  $payment_id = $_POST['payment_id'];
+  $status = $_POST['payment_status'];
+  
+  mysqli_query($conn, "UPDATE payments SET payment_status='$status' WHERE payment_id='$payment_id'");
+  
+  $redirect_url = 'order_admin.php';
+  if (isset($_GET['view_payments'])) {
+      $redirect_url .= '?view_payments=1';
+  }
+  echo "<script>alert('Status pembayaran diperbarui'); window.location='$redirect_url';</script>";
+  exit();
+}
+
 // --- Ambil Semua Customer untuk Dropdown ---
 $customers = mysqli_query($conn, "SELECT * FROM customer ORDER BY nama");
 
@@ -90,6 +105,18 @@ if (!empty($status_filter)) {
 
 $query .= " ORDER BY o.tgl_order DESC";
 $result = mysqli_query($conn, $query);
+
+// Query untuk payment proofs jika diperlukan
+if (isset($_GET['view_payments'])) {
+    $payments_query = "
+        SELECT p.*, c.nama AS customer 
+        FROM payments p
+        JOIN orders o ON p.order_id = o.order_id
+        JOIN customer c ON o.customer_id = c.customer_id
+        ORDER BY p.tanggal_bayar DESC
+    ";
+    $payments_result = mysqli_query($conn, $payments_query);
+}
 ?>
 
 <!DOCTYPE html>
@@ -99,6 +126,7 @@ $result = mysqli_query($conn, $query);
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data Order - Stryk Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body class="bg-gray-900 text-white p-6">
@@ -136,60 +164,170 @@ $result = mysqli_query($conn, $query);
     </div>
   </form>
 
-
-  <!-- Tabel Order -->
-  <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
-    <table class="w-full">
-      <thead class="bg-gray-700 text-yellow-400">
-        <tr>
-          <th class="py-3 px-4 text-left">ID Order</th>
-          <th class="py-3 px-4 text-left">Customer</th>
-          <th class="py-3 px-4 text-left">Tanggal Order</th>
-          <th class="py-3 px-4 text-left">Total</th>
-          <th class="py-3 px-4 text-left">Status</th>
-          <th class="py-3 px-4 text-center">Aksi</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-700">
-        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-          <tr class="hover:bg-gray-700">
-            <td class="py-3 px-4"><?= $row['order_id'] ?></td>
-            <td class="py-3 px-4"><?= htmlspecialchars($row['customer']) ?></td>
-            <td class="py-3 px-4"><?= date('d-m-Y H:i', strtotime($row['tgl_order'])) ?></td>
-            <td class="py-3 px-4">$ <?= number_format($row['total_harga'], 0, ',', '.') ?></td>
-            <td class="py-3 px-4">
-              <form method="POST" class="flex items-center space-x-2">
-                <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
-                <select name="status" class="px-3 py-1 rounded bg-gray-700 text-white border border-gray-600">
-                  <option value="pending" <?= $row['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                  <option value="proses" <?= $row['status'] === 'proses' ? 'selected' : '' ?>>Proses</option>
-                  <option value="selesai" <?= $row['status'] === 'selesai' ? 'selected' : '' ?>>Selesai</option>
-                </select>
-                <button type="submit" name="update_status" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-sm">
-                  Update
-                </button>
-              </form>
-            </td>
-            <td class="py-3 px-4 text-center">
-  <div class="flex justify-center space-x-2">
-    <?php if ($row['status'] === 'proses'): ?>
-      <a href="tracking_admin.php?order_id=<?= $row['order_id'] ?>" 
-         class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm">
-        Tracking
-      </a>
-    <?php endif; ?>
-
-    <a href="order_admin.php?hapus=<?= $row['order_id'] ?>" 
-       onclick="return confirm('Yakin hapus order ini?')"
-       class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-      Hapus
+  <!-- Tab Navigation -->
+  <div class="flex border-b border-gray-700 mb-6">
+    <a href="order_admin.php" class="px-4 py-2 <?= !isset($_GET['view_payments']) ? 'border-b-2 border-yellow-400 text-yellow-400' : 'text-gray-400' ?> font-medium">
+      Orders
+    </a>
+    <a href="order_admin.php?view_payments=1" class="px-4 py-2 <?= isset($_GET['view_payments']) ? 'border-b-2 border-yellow-400 text-yellow-400' : 'text-gray-400' ?> font-medium">
+      Payment Proofs
     </a>
   </div>
-</td>
+
+  <?php if (!isset($_GET['view_payments'])): ?>
+    <!-- Tabel Order -->
+    <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
+      <table class="w-full">
+        <thead class="bg-gray-700 text-yellow-400">
+          <tr>
+            <th class="py-3 px-4 text-left">ID Order</th>
+            <th class="py-3 px-4 text-left">Customer</th>
+            <th class="py-3 px-4 text-left">Tanggal Order</th>
+            <th class="py-3 px-4 text-left">Total</th>
+            <th class="py-3 px-4 text-left">Status</th>
+            <th class="py-3 px-4 text-center">Aksi</th>
           </tr>
-        <?php endwhile; ?>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody class="divide-y divide-gray-700">
+          <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+            <tr class="hover:bg-gray-700">
+              <td class="py-3 px-4"><?= $row['order_id'] ?></td>
+              <td class="py-3 px-4"><?= htmlspecialchars($row['customer']) ?></td>
+              <td class="py-3 px-4"><?= date('d-m-Y H:i', strtotime($row['tgl_order'])) ?></td>
+              <td class="py-3 px-4">$ <?= number_format($row['total_harga'], 0, ',', '.') ?></td>
+              <td class="py-3 px-4">
+                <form method="POST" class="flex items-center space-x-2">
+                  <input type="hidden" name="order_id" value="<?= $row['order_id'] ?>">
+                  <select name="status" class="px-3 py-1 rounded bg-gray-700 text-white border border-gray-600">
+                    <option value="pending" <?= $row['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
+                    <option value="proses" <?= $row['status'] === 'proses' ? 'selected' : '' ?>>Proses</option>
+                    <option value="selesai" <?= $row['status'] === 'selesai' ? 'selected' : '' ?>>Selesai</option>
+                  </select>
+                  <button type="submit" name="update_status" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-sm">
+                    Update
+                  </button>
+                </form>
+              </td>
+              <td class="py-3 px-4 text-center">
+                <div class="flex justify-center space-x-2">
+                  <?php if ($row['status'] === 'proses'): ?>
+                    <a href="tracking_admin.php?order_id=<?= $row['order_id'] ?>" 
+                      class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm">
+                      Tracking
+                    </a>
+                  <?php endif; ?>
+
+                  <a href="order_admin.php?view_payments=1&order_id=<?= $row['order_id'] ?>" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                    Payment
+                  </a>
+
+                  <a href="order_admin.php?hapus=<?= $row['order_id'] ?>" 
+                    onclick="return confirm('Yakin hapus order ini?')"
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                    Hapus
+                  </a>
+                </div>
+              </td>
+            </tr>
+          <?php endwhile; ?>
+        </tbody>
+      </table>
+    </div>
+  <?php else: ?>
+    <!-- Payment Proofs Section -->
+    <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
+      <table class="w-full">
+        <thead class="bg-gray-700 text-yellow-400">
+          <tr>
+            <th class="py-3 px-4 text-left">Order ID</th>
+            <th class="py-3 px-4 text-left">Customer</th>
+            <th class="py-3 px-4 text-left">Payment Method</th>
+            <th class="py-3 px-4 text-left">Amount</th>
+            <th class="py-3 px-4 text-left">Payment Date</th>
+            <th class="py-3 px-4 text-left">Status</th>
+            <th class="py-3 px-4 text-left">Proof</th>
+            <th class="py-3 px-4 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-700">
+          <?php
+          $order_filter = isset($_GET['order_id']) ? "AND p.order_id = '".$_GET['order_id']."'" : "";
+          $payments_query = "
+            SELECT p.*, c.nama AS customer, o.total_harga
+            FROM payments p
+            JOIN orders o ON p.order_id = o.order_id
+            JOIN customer c ON o.customer_id = c.customer_id
+            WHERE 1=1 $order_filter
+            ORDER BY p.tanggal_bayar DESC
+          ";
+          $payments_result = mysqli_query($conn, $payments_query);
+          
+          while ($payment = mysqli_fetch_assoc($payments_result)): 
+          ?>
+            <tr class="hover:bg-gray-700">
+              <td class="py-3 px-4"><?= $payment['order_id'] ?></td>
+              <td class="py-3 px-4"><?= htmlspecialchars($payment['customer']) ?></td>
+              <td class="py-3 px-4"><?= $payment['metode'] ?></td>
+              <td class="py-3 px-4">$ <?= number_format($payment['jumlah_dibayar'], 0, ',', '.') ?></td>
+              <td class="py-3 px-4"><?= date('d-m-Y H:i', strtotime($payment['tanggal_bayar'])) ?></td>
+              <td class="py-3 px-4">
+                <form method="POST" class="flex items-center space-x-2">
+                  <input type="hidden" name="payment_id" value="<?= $payment['payment_id'] ?>">
+                  <select name="payment_status" class="px-3 py-1 rounded bg-gray-700 text-white border border-gray-600">
+                    <option value="pending" <?= $payment['payment_status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
+                    <option value="verified" <?= $payment['payment_status'] === 'verified' ? 'selected' : '' ?>>Verified</option>
+                    <option value="rejected" <?= $payment['payment_status'] === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                  </select>
+                  <button type="submit" name="update_payment_status" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-sm">
+                    Update
+                  </button>
+                </form>
+              </td>
+              <td class="py-3 px-4">
+                <?php if (!empty($payment['payment_proof'])): ?>
+                  <a href="#" onclick="openModal('<?= $payment['payment_proof'] ?>')" class="text-blue-400 hover:text-blue-300">
+                    View Proof
+                  </a>
+                <?php else: ?>
+                  No proof uploaded
+                <?php endif; ?>
+              </td>
+              <td class="py-3 px-4 text-center">
+                <a href="order_admin.php?view_payments=1&order_id=<?= $payment['order_id'] ?>" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                  Details
+                </a>
+              </td>
+            </tr>
+          <?php endwhile; ?>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+      <div class="bg-gray-800 p-4 rounded-lg max-w-4xl max-h-screen">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">Payment Proof</h3>
+          <button onclick="closeModal()" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <img id="modalImage" src="" alt="Payment Proof" class="max-w-full max-h-[80vh]">
+      </div>
+    </div>
+
+    <script>
+      function openModal(imageSrc) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageModal').classList.remove('hidden');
+      }
+      
+      function closeModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+      }
+    </script>
+  <?php endif; ?>
 </body>
 </html>
