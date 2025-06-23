@@ -174,14 +174,14 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
               <p class="mb-2"><span class="text-gray-400">Metode:</span> <?= $row['metode'] ?></p>
             </div>
             <div>
-              <p class="mb-2"><span class="text-gray-400">Jumlah:</span> Rp <?= number_format($row['jumlah_dibayar'], 0, ',', '.') ?></p>
+              <p class="mb-2"><span class="text-gray-400">Jumlah:</span> $ <?= number_format($row['jumlah_dibayar'], 0, ',', '.') ?></p>
               <p class="mb-2"><span class="text-gray-400">Status:</span> 
                 <span class="status-badge <?= $row['status'] === 'pending' ? 'status-pending' : ($row['status'] === 'proses' ? 'status-proses' : 'status-selesai') ?>">
                   <?= ucfirst($row['status']) ?>
                 </span>
               </p>
               <p class="mb-2"><span class="text-gray-400">Order Date:</span> <?= date('d/m/Y H:i', strtotime($row['tgl_order'])) ?></p>
-              <p class="mb-2"><span class="text-gray-400">Total:</span> Rp <?= number_format($row['total_harga'], 0, ',', '.') ?></p>
+              <p class="mb-2"><span class="text-gray-400">Total:</span> $ <?= number_format($row['total_harga'], 0, ',', '.') ?></p>
             </div>
           </div>
           <div class="mt-4 flex space-x-2 no-print">
