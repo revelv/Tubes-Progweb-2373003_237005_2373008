@@ -56,6 +56,77 @@ include 'header.php';
 		</form>
 	</div>
 
+	<div class="container_produk mb-4">
+		<div class="text-center">
+            <h1 class="section-heading text-uppercase">Recommendations</h1>
+            <h3 class="section-subheading text-muted"><small> out our featured products!</small></h3>
+			<br>
+        </div>
+		<div class="row">
+			<?php
+			// Query untuk mendapatkan 3 produk dengan stok terbanyak DAN terlama (product_id ASC)
+			$recommend_query = "SELECT * FROM products ORDER BY stok DESC, product_id ASC LIMIT 3";
+			$recommend_result = mysqli_query($conn, $recommend_query);
+
+			while ($rec_row = mysqli_fetch_assoc($recommend_result)) {
+			?>
+				<div class="col-sm-6 col-md-4">
+					<div class="thumbnail">
+						<a href="#"
+							class="product-detail"
+							data-bs-toggle="modal"
+							data-bs-target="#detailModal"
+							data-id="<?= $rec_row['product_id']; ?>"
+							data-nama="<?= htmlspecialchars($rec_row['nama_produk'], ENT_QUOTES); ?>"
+							data-harga="<?= $rec_row['harga']; ?>"
+							data-stok="<?= $rec_row['stok']; ?>"
+							data-kategori="<?= $rec_row['category']; ?>"
+							data-deskripsi="<?= htmlspecialchars($rec_row['deskripsi_produk'] ?? ''); ?>"
+							data-gambar="<?= $rec_row['link_gambar']; ?>">
+							<img id="gambar" src="<?= $rec_row['link_gambar']; ?>" alt="<?= $rec_row['nama_produk']; ?>">
+						</a>
+
+						<div class="caption">
+							<h3><?= $rec_row['nama_produk']; ?></h3>
+							<h4>$<?= $rec_row['harga']; ?></h4>
+							<p><strong>Stock:</strong> <?= $rec_row['stok']; ?></p>
+						</div>
+
+						<div class="button">
+							<?php
+							$rec_stok = (int)$rec_row['stok'];
+
+							if ($rec_stok < 1) {
+								echo '<div class=""><button class="btn btn-secondary btn-block" disabled>SOLD OUT</button></div>';
+							} else {
+								if (isset($_SESSION['kd_cs'])) {
+									echo '<div class="">
+                                    <a href="add_to_cart.php?product_id=' . $rec_row['product_id'] . '" class="btn btn-success btn-block" role="button">
+                                        <i class="glyphicon glyphicon-shopping-cart"></i> Add to cart
+                                    </a>
+                                  </div>';
+								} else {
+									echo '<div class="">
+                                    <a href="#" class="btn btn-success btn-block" role="button">
+                                        <i class="glyphicon glyphicon-shopping-cart"></i> Login to Add
+                                    </a>
+                                  </div>';
+								}
+							}
+							?>
+						</div>
+					</div>
+				</div>
+			<?php
+			}
+			?>
+		</div>
+	</div>
+
+	<div class="container_produk">
+		<h2 id="judul"></h2>
+	</div>
+
 	<div class="container_produk">
 		<div class="row">
 			<?php
