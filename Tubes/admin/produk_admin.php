@@ -140,7 +140,7 @@ $result = mysqli_query($conn, $query);
         🔍 Cari
       </button>
       <a href="produk_admin.php" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-center">
-        Reset
+        Refresh
       </a>
     </div>
   </form>

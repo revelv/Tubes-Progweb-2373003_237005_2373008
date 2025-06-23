@@ -113,7 +113,7 @@ $total = 0;
 
     <!-- Area Tampilan Pembayaran -->
     <div id="paymentContainer">
-        
+
     </div>
 
     <!-- Tombol Pay (Original Button) -->
@@ -175,10 +175,21 @@ $total = 0;
             }
         }
 
+        <?php
+        $order_query = mysqli_query($conn, "SELECT MAX(order_id) AS last_id FROM orders");
+        $order_data = mysqli_fetch_assoc($order_query);
+        $next_order_id = $order_data['last_id'] + 1;
+
+        ?>
+
+
+        const fixedOrderID = "STYRK_ORDER<?= $next_order_id ?>_";
+
         function generateQRContent() {
-            const randomCode = "ORDER" + Date.now() + Math.floor(Math.random() * 1000);
-            return encodeURIComponent(randomCode);
+            const randomCode = Math.floor(Math.random() * 900) + 100;
+            return encodeURIComponent(fixedOrderID + randomCode);
         }
+
 
         function startQRISTimer() {
             clearInterval(qrTimer);
@@ -199,8 +210,15 @@ $total = 0;
                     qrContent = generateQRContent();
                     document.getElementById("qrImage").src =
                         "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + qrContent;
+
+                    // Update input hidden biar ngikut QR barunya
+                    const kodeTransaksiInput = document.querySelector("input[name='kode_transaksi']");
+                    if (kodeTransaksiInput) {
+                        kodeTransaksiInput.value = qrContent;
+                    }
+
                     startQRISTimer();
-                    alert("QR baru telah digenerate karena belum ada konfirmasi pembayaran.");
+                    alert("QR baru telah digenerate karena timeout.");
                 }
             }, 1000);
         }

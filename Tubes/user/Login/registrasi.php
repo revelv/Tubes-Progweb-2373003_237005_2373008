@@ -1,178 +1,206 @@
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
+    <title>Registrasi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-    :root {
-        --primary: #4361ee;
-        --secondary: #3f37c9;
-        --accent: #4895ef;
-        --light: #f8f9fa;
-        --dark: #212529;
-        --success: #4cc9f0;
-        --error: #f72585;
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 50px auto;
-        padding: 40px;
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border-radius: 16px;
-        box-shadow: 
-            0 8px 32px rgba(31, 38, 135, 0.1),
-            0 4px 8px rgba(0, 0, 0, 0.05);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .container::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(67, 97, 238, 0.1) 0%, rgba(255,255,255,0) 70%);
-        z-index: -1;
-    }
-
-    .form-group {
-        margin-bottom: 24px;
-        position: relative;
-    }
-
-    label {
-        font-weight: 600;
-        color: var(--dark);
-        margin-bottom: 8px;
-        display: block;
-        font-size: 14px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-
-    .form-control {
-        height: 50px;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 12px 20px;
-        font-size: 15px;
-        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        background-color: rgba(255, 255, 255, 0.8);
-        width: 100%;
-    }
-
-    .form-control:focus {
-        border-color: var(--accent);
-        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
-        outline: none;
-        transform: translateY(-2px);
-    }
-
-    .form-control:hover {
-        border-color: #adb5bd;
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        border: none;
-        padding: 14px 32px;
-        font-size: 16px;
-        font-weight: 600;
-        border-radius: 8px;
-        color: white;
-        cursor: pointer;
-        transition: all 0.4s ease;
-        box-shadow: 0 4px 6px rgba(67, 97, 238, 0.1);
-        display: inline-block;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-top: 20px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-success::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        z-index: 1;
-    }
-
-    .btn-success:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 15px rgba(67, 97, 238, 0.2);
-    }
-
-    .btn-success:hover::after {
-        opacity: 1;
-    }
-
-    .btn-success span {
-        position: relative;
-        z-index: 2;
-    }
-
-    .row {
-        margin-bottom: 20px;
-    }
-
-    @media (max-width: 768px) {
+        /* Reset dan Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        
+        /* Container Form */
         .container {
-            padding: 30px;
-            margin: 20px;
+            background-color: #1e1e1e;
             border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            animation: fadeIn 0.5s ease-in-out;
+            border: 1px solid #333;
+        }
+        
+        /* Judul */
+        h2 {
+            color: #d4af37;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        /* Form Group */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d4af37;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #2a2a2a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            color: #e0e0e0;
+        }
+        
+        .form-control:focus {
+            border-color: #d4af37;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+        
+        /* Grid System */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
         }
         
         .col-md-6 {
-            margin-bottom: 20px;
+            padding: 0 15px;
+            flex: 0 0 50%;
+            max-width: 50%;
         }
-
+        
+        /* Tombol Emas */
         .btn-success {
-            width: 100%;
-            padding: 16px;
+            background: linear-gradient(135deg, #d4af37 0%, #f9d423 100%);
+            color: #1e1e1e;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            text-decoration: none;
         }
-    }
-
-    .container {
-        animation: float 6s ease-in-out infinite;
-    }
-
-    .form-group:focus-within label {
-        color: var(--primary);
-        transform: translateY(-2px);
-    }
-
-</style>
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+        
+        .btn-success:active {
+            transform: translateY(0);
+        }
+        
+        /* Efek kilau emas pada tombol */
+        .btn-success::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 50%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(30deg);
+            transition: all 0.3s;
+        }
+        
+        .btn-success:hover::after {
+            left: 110%;
+        }
+        
+        /* Link Kembali */
+        a[href="../produk.php"] {
+            display: inline-block;
+            margin-left: 15px;
+            margin-top: 20px;
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        
+        a[href="../produk.php"]:hover {
+            color: #d4af37;
+            text-decoration: underline;
+        }
+        
+        /* Animasi */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsif */
+        @media (max-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .btn-success, a[href="../produk.php"] {
+                width: 100%;
+                margin-left: 0;
+                text-align: center;
+            }
+            
+            a[href="../produk.php"] {
+                margin-top: 15px;
+                display: block;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container" style="padding-bottom: 250px;">
+    <div class="container">
+        <h2>Form Registrasi</h2>
         <form action="proses_registrasi.php" method="POST">
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="exampleInputPassword1">Nama</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Nama" name="nama" required>
+                        <label for="nama">Nama</label>
+                        <input type="text" class="form-control" id="nama" placeholder="Nama Lengkap" name="nama" required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="exampleInputPassword1">Email</label>
-                        <input type="email" class="form-control" id="exampleInputPassword1" placeholder="Email" name="email" required>
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Alamat Email" name="email" required>
                     </div>
                 </div>
             </div>
@@ -180,14 +208,14 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="exampleInputPassword1">Alamat</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Alamat" name="alamat" required>
+                        <label for="alamat">Alamat</label>
+                        <input type="text" class="form-control" id="alamat" placeholder="Alamat Lengkap" name="alamat" required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="exampleInputPassword1">No Telepon</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" placeholder="+62" name="telp" required>
+                        <label for="telp">No Telepon</label>
+                        <input type="text" class="form-control" id="telp" placeholder="+62" name="telp" required>
                     </div>
                 </div>
             </div>
@@ -195,22 +223,21 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="exampleInputPassword1">Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password" required>
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password (min 8 karakter)" name="password" required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="exampleInputPassword1">Konfirmasi Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Konfirmasi Password" name="konfirmasi" required>
+                        <label for="konfirmasi">Konfirmasi Password</label>
+                        <input type="password" class="form-control" id="konfirmasi" placeholder="Ulangi Password" name="konfirmasi" required>
                     </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-success">Register</button>
-            <a href="../produk.php">back</a>
+            <button type="submit" class="btn-success">Register</button>
+            <a href="../produk.php">Kembali ke Produk</a>
         </form>
     </div>
 </body>
-
 </html>

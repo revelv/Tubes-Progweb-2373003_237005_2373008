@@ -1,13 +1,13 @@
 /* General Styles */
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: #ffffff;
     color: #333333;
     margin: 0;
- 
+
 }
 
-#status{
+#status {
     color: rgb(102, 175, 0);
 }
 
@@ -25,7 +25,8 @@ h2 {
 
 .order-card {
     background-color: #ffffff;
-    border: 1px solid #d4af37; /* Gold border */
+    border: 1px solid #d4af37;
+    /* Gold border */
     border-radius: 12px;
     padding: 20px;
     margin: 30px;
@@ -41,7 +42,8 @@ h2 {
 .order-header {
     font-weight: 600;
     color: #000000;
-    border-bottom: 2px solid #d4af37; /* Gold accent */
+    border-bottom: 2px solid #d4af37;
+    /* Gold accent */
     padding-bottom: 15px;
     margin-bottom: 15px;
     font-size: 18px;
@@ -52,14 +54,15 @@ h2 {
     color: #555555;
     margin: 10px 0;
     padding: 10px;
-    border-left: 4px solid #d4af37; /* Gold accent */
+    border-left: 4px solid #d4af37;
+    /* Gold accent */
     background-color: #f9f9f9;
     border-radius: 4px;
 }
 
 .tracking-log {
     margin-top: 20px;
-    
+
 }
 
 .tracking-log h4 {
@@ -67,7 +70,7 @@ h2 {
     color: #000000;
     font-size: 18px;
     margin-bottom: 10px;
-    
+
 }
 
 .tracking-log p {
