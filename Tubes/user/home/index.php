@@ -94,7 +94,7 @@
         <div class="row">
             <?php
             // Database connection
-            require_once 'koneksi.php';
+            require_once '../koneksi.php';
 
             // Get 3 products with highest stock AND oldest in database
             $query = "SELECT * FROM products 
