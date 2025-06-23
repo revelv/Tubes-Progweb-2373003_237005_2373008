@@ -8,8 +8,10 @@ if (!isset($_SESSION['kd_cs'])) {
 
 $customer_id = $_SESSION['kd_cs'];
 
-// Jika metode pembayaran = Transfer Bank (upload bukti)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pay_bank'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Cek metode pembayaran
+    $payment_method = $_POST['metode'] ?? '';
 
     // Ambil data cart
     $query = "SELECT c.*, p.harga, p.stok FROM carts c 
@@ -59,43 +61,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pay_bank'])) {
             WHERE product_id = '{$item['product_id']}'");
     }
 
-    // Upload bukti pembayaran
-    if (isset($_FILES['bukti']) && $_FILES['bukti']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = "../payment_proofs/";
-        if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0755, true);
-        }
+    // === Handle metode Transfer Bank ===
+    if ($payment_method === 'Transfer') {
+        if (isset($_FILES['bukti']) && $_FILES['bukti']['error'] === UPLOAD_ERR_OK) {
+            $target_dir = "../payment_proofs/";
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0755, true);
+            }
 
-        $file_ext = pathinfo($_FILES['bukti']['name'], PATHINFO_EXTENSION);
-        $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
-        if (!in_array(strtolower($file_ext), $allowed_ext)) {
-            die("Format file tidak didukung.");
-        }
+            $file_ext = pathinfo($_FILES['bukti']['name'], PATHINFO_EXTENSION);
+            $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
+            if (!in_array(strtolower($file_ext), $allowed_ext)) {
+                die("Format file tidak didukung.");
+            }
 
-        if ($_FILES['bukti']['size'] > 2000000) { // 2MB
-            die("Ukuran file maksimal 2MB.");
-        }
+            if ($_FILES['bukti']['size'] > 2000000) {
+                die("Ukuran file maksimal 2MB.");
+            }
 
-        $new_filename = "proof_" . $order_id . "_" . time() . "." . $file_ext;
-        $target_file = $target_dir . $new_filename;
+            $new_filename = "proof_" . $order_id . "_" . time() . "." . $file_ext;
+            $target_file = $target_dir . $new_filename;
 
-        if (move_uploaded_file($_FILES['bukti']['tmp_name'], $target_file)) {
-            mysqli_query($conn, "INSERT INTO payments 
-                (order_id, metode, jumlah_dibayar, tanggal_bayar, payment_proof, payment_status) 
-                VALUES ('$order_id', 'Transfer Bank', '$grand_total', '$tanggal', '$target_file', 'pending')");
-
-            mysqli_query($conn, "DELETE FROM carts WHERE customer_id = '$customer_id'");
-
-            echo "<script>
-                alert('Pembayaran berhasil diupload! Order Anda akan diproses.');
-                window.location.href = 'riwayat_belanja.php';
-            </script>";
-            exit;
+            if (move_uploaded_file($_FILES['bukti']['tmp_name'], $target_file)) {
+                mysqli_query($conn, "INSERT INTO payments 
+                    (order_id, metode, jumlah_dibayar, tanggal_bayar, payment_proof, payment_status) 
+                    VALUES ('$order_id', 'Transfer Bank', '$grand_total', '$tanggal', '$target_file', 'pending')");
+            } else {
+                die("Gagal upload bukti pembayaran.");
+            }
         } else {
-            die("Gagal upload bukti pembayaran.");
+            die("Bukti pembayaran wajib diupload.");
         }
-    } else {
-        die("Bukti pembayaran wajib diupload.");
     }
+
+    // === Handle metode QRIS ===
+    elseif ($payment_method === 'QRIS') {
+        $qris_code = $_POST['kode_transaksi'] ?? '';
+        if (empty($qris_code)) {
+            die("Kode transaksi QRIS wajib diisi.");
+        }
+
+        mysqli_query($conn, "INSERT INTO payments 
+            (order_id, metode, jumlah_dibayar, tanggal_bayar, payment_proof, payment_status) 
+            VALUES ('$order_id', 'QRIS', '$grand_total', '$tanggal', '$qris_code', 'pending')");
+    }
+
+    // Bersihkan cart
+    mysqli_query($conn, "DELETE FROM carts WHERE customer_id = '$customer_id'");
+
+    echo "<script>
+        alert('Pembayaran berhasil diproses! Order Anda akan segera diproses.');
+        window.location.href = 'riwayat_belanja.php';
+    </script>";
+    exit;
 }
 ?>

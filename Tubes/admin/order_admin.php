@@ -58,12 +58,12 @@ if (isset($_POST['update_status'])) {
 if (isset($_POST['update_payment_status'])) {
   $payment_id = $_POST['payment_id'];
   $status = $_POST['payment_status'];
-  
+
   mysqli_query($conn, "UPDATE payments SET payment_status='$status' WHERE payment_id='$payment_id'");
-  
+
   $redirect_url = 'order_admin.php';
   if (isset($_GET['view_payments'])) {
-      $redirect_url .= '?view_payments=1';
+    $redirect_url .= '?view_payments=1';
   }
   echo "<script>alert('Status pembayaran diperbarui'); window.location='$redirect_url';</script>";
   exit();
@@ -108,19 +108,20 @@ $result = mysqli_query($conn, $query);
 
 // Query untuk payment proofs jika diperlukan
 if (isset($_GET['view_payments'])) {
-    $payments_query = "
+  $payments_query = "
         SELECT p.*, c.nama AS customer 
         FROM payments p
         JOIN orders o ON p.order_id = o.order_id
         JOIN customer c ON o.customer_id = c.customer_id
         ORDER BY p.tanggal_bayar DESC
     ";
-    $payments_result = mysqli_query($conn, $payments_query);
+  $payments_result = mysqli_query($conn, $payments_query);
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -136,8 +137,8 @@ if (isset($_GET['view_payments'])) {
   <!-- Filter Pencarian -->
   <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
     <div>
-      <input type="text" name="search" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" 
-             placeholder="Cari order..." value="<?= htmlspecialchars($search) ?>">
+      <input type="text" name="search" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+        placeholder="Cari order..." value="<?= htmlspecialchars($search) ?>">
     </div>
     <div>
       <select name="search_by" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600">
@@ -159,7 +160,7 @@ if (isset($_GET['view_payments'])) {
         🔍 Cari
       </button>
       <a href="order_admin.php" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-center">
-        🔄 Reset
+        🔄 Refresh
       </a>
     </div>
   </form>
@@ -211,18 +212,18 @@ if (isset($_GET['view_payments'])) {
               <td class="py-3 px-4 text-center">
                 <div class="flex justify-center space-x-2">
                   <?php if ($row['status'] === 'proses'): ?>
-                    <a href="tracking_admin.php?order_id=<?= $row['order_id'] ?>" 
+                    <a href="tracking_admin.php?order_id=<?= $row['order_id'] ?>"
                       class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm">
                       Tracking
                     </a>
                   <?php endif; ?>
 
-                  <a href="order_admin.php?view_payments=1&order_id=<?= $row['order_id'] ?>" 
+                  <a href="order_admin.php?view_payments=1&order_id=<?= $row['order_id'] ?>"
                     class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
                     Payment
                   </a>
 
-                  <a href="order_admin.php?hapus=<?= $row['order_id'] ?>" 
+                  <a href="order_admin.php?hapus=<?= $row['order_id'] ?>"
                     onclick="return confirm('Yakin hapus order ini?')"
                     class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
                     Hapus
@@ -247,12 +248,11 @@ if (isset($_GET['view_payments'])) {
             <th class="py-3 px-4 text-left">Payment Date</th>
             <th class="py-3 px-4 text-left">Status</th>
             <th class="py-3 px-4 text-left">Proof</th>
-            <th class="py-3 px-4 text-center">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-700">
           <?php
-          $order_filter = isset($_GET['order_id']) ? "AND p.order_id = '".$_GET['order_id']."'" : "";
+          $order_filter = isset($_GET['order_id']) ? "AND p.order_id = '" . $_GET['order_id'] . "'" : "";
           $payments_query = "
             SELECT p.*, c.nama AS customer, o.total_harga
             FROM payments p
@@ -262,8 +262,9 @@ if (isset($_GET['view_payments'])) {
             ORDER BY p.tanggal_bayar DESC
           ";
           $payments_result = mysqli_query($conn, $payments_query);
-          
-          while ($payment = mysqli_fetch_assoc($payments_result)): 
+
+
+          while ($payment = mysqli_fetch_assoc($payments_result)):
           ?>
             <tr class="hover:bg-gray-700">
               <td class="py-3 px-4"><?= $payment['order_id'] ?></td>
@@ -285,20 +286,22 @@ if (isset($_GET['view_payments'])) {
                 </form>
               </td>
               <td class="py-3 px-4">
-                <?php if (!empty($payment['payment_proof'])): ?>
-                  <a href="#" onclick="openModal('<?= $payment['payment_proof'] ?>')" class="text-blue-400 hover:text-blue-300">
-                    View Proof
-                  </a>
+                <?php if ($payment['metode'] === 'Transfer Bank'): ?>
+                  <?php if (!empty($payment['payment_proof']) && file_exists($payment['payment_proof'])): ?>
+                    <a href="#" onclick="openModal('<?= $payment['payment_proof'] ?>')" class="text-blue-400 hover:text-blue-300">
+                      View Proof
+                    </a>
+                  <?php else: ?>
+                    No proof uploaded
+                  <?php endif; ?>
+                <?php elseif ($payment['metode'] === 'QRIS'): ?>
+                  <span class="text-green-400 break-all"><?= htmlspecialchars($payment['payment_proof']) ?></span>
                 <?php else: ?>
-                  No proof uploaded
+                  -
                 <?php endif; ?>
               </td>
-              <td class="py-3 px-4 text-center">
-                <a href="order_admin.php?view_payments=1&order_id=<?= $payment['order_id'] ?>" 
-                  class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                  Details
-                </a>
-              </td>
+
+             
             </tr>
           <?php endwhile; ?>
         </tbody>
@@ -314,7 +317,7 @@ if (isset($_GET['view_payments'])) {
             <i class="fas fa-times"></i>
           </button>
         </div>
-        <img id="modalImage" src="" alt="Payment Proof" class="max-w-full max-h-[80vh]">
+        <img id="modalImage" src="" alt="<?php $bukti ?>" class="max-w-full max-h-[80vh]">
       </div>
     </div>
 
@@ -323,11 +326,12 @@ if (isset($_GET['view_payments'])) {
         document.getElementById('modalImage').src = imageSrc;
         document.getElementById('imageModal').classList.remove('hidden');
       }
-      
+
       function closeModal() {
         document.getElementById('imageModal').classList.add('hidden');
       }
     </script>
   <?php endif; ?>
 </body>
+
 </html>
