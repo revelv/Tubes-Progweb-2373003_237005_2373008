@@ -48,10 +48,43 @@ if (isset($_POST['insert'])) {
 
 // --- Ubah Status Order ---
 if (isset($_POST['update_status'])) {
-  $order_id = $_POST['order_id'];
-  $status = $_POST['status'];
-  mysqli_query($conn, "UPDATE orders SET status='$status' WHERE order_id='$order_id'");
-  echo "<script>alert('Status order diperbarui'); window.location='order_admin.php';</script>";
+  $order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
+  $status = mysqli_real_escape_string($conn, $_POST['status']);
+  
+  // Mulai transaction
+  mysqli_begin_transaction($conn);
+  
+  try {
+    // Jika status diubah menjadi "proses", buat struk pembayaran
+    if ($status == 'proses') {
+      // Cek apakah sudah ada pembayaran untuk order ini
+      $cek_payment = mysqli_query($conn, "SELECT * FROM payments WHERE order_id='$order_id'");
+      if (!$cek_payment) throw new Exception(mysqli_error($conn));
+      
+      if (mysqli_num_rows($cek_payment) == 0) {
+        // Jika belum ada, buat record pembayaran baru
+        $order_data = mysqli_query($conn, "SELECT * FROM orders WHERE order_id='$order_id'");
+        if (!$order_data) throw new Exception(mysqli_error($conn));
+        
+        $order = mysqli_fetch_assoc($order_data);
+        $metode = 'QRIS'; // Default payment method
+        $jumlah = $order['total_harga'];
+        
+        $insert = mysqli_query($conn, "INSERT INTO payments (order_id, metode, jumlah_dibayar, tanggal_bayar, payment_status) 
+          VALUES ('$order_id', '$metode', '$jumlah', NOW(), 'pending')");
+        if (!$insert) throw new Exception(mysqli_error($conn));
+      }
+    }
+    
+    $update = mysqli_query($conn, "UPDATE orders SET status='$status' WHERE order_id='$order_id'");
+    if (!$update) throw new Exception(mysqli_error($conn));
+    
+    mysqli_commit($conn);
+    echo "<script>alert('Status order diperbarui'); window.location='order_admin.php';</script>";
+  } catch (Exception $e) {
+    mysqli_rollback($conn);
+    echo "<script>alert('Error: ".addslashes($e->getMessage())."'); window.location='order_admin.php';</script>";
+  }
 }
 
 // --- Update Payment Status ---
