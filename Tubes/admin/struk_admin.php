@@ -30,7 +30,7 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>History Pembayaran - Stryk Admin</title>
+  <title>History Pembayaran - Stryk Industries</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
     /* Gaya untuk menyembunyikan tombol saat cetak */
@@ -190,7 +190,7 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
         <!-- Isi Struk -->
         <div class="p-4">
           <div class="struk-header">
-            <div class="struk-title">STRUK PEMBAYARAN</div>
+            <div class="struk-title">STRUK PEMBAYARAN Stryk Admin</div>
             <div class="text-center text-sm mb-2"><?= date('d/m/Y H:i', strtotime($row['tanggal_bayar'])) ?></div>
           </div>
           
@@ -233,7 +233,7 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
           
           <div class="struk-footer">
             Terima kasih atas pembayarannya<br>
-            Stryk Admin &copy; <?= date('Y') ?>
+            Stryk Industries &copy; <?= date('Y') ?>
           </div>
         </div>
       </div>
