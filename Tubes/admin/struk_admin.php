@@ -2,49 +2,17 @@
 include 'koneksi.php';
 include 'header_admin.php';
 
-// --- Hapus pembayaran ---
-if (isset($_GET['hapus'])) {
-  $id = $_GET['hapus'];
-  mysqli_query($conn, "DELETE FROM payments WHERE payment_id='$id'");
-  echo "<script>alert('Struk berhasil dihapus'); window.location='struk_admin.php';</script>";
-}
-
-// --- Ambil data untuk edit ---
-$edit = null;
-if (isset($_GET['edit'])) {
-  $id = $_GET['edit'];
-  $res = mysqli_query($conn, "SELECT * FROM payments WHERE payment_id='$id'");
-  $edit = mysqli_fetch_assoc($res);
-}
-
-// --- Simpan perubahan pembayaran ---
-if (isset($_POST['update'])) {
-  $id = $_POST['payment_id'];
-  $order_id = $_POST['order_id'];
-  $metode = $_POST['metode'];
-  $jumlah = $_POST['jumlah_dibayar'];
-  $tanggal = $_POST['tanggal_bayar'];
-
-  mysqli_query($conn, "UPDATE payments SET 
-    order_id='$order_id', 
-    metode='$metode', 
-    jumlah_dibayar='$jumlah', 
-    tanggal_bayar='$tanggal' 
-    WHERE payment_id='$id'");
-  echo "<script>alert('Struk diperbarui'); window.location='struk_admin.php';</script>";
-}
-
 // --- Filter pencarian ---
 $search = $_GET['search'] ?? '';
 
-// Query utama
+// Query utama dengan filter status
 $query = "
   SELECT p.*, o.tgl_order, o.total_harga, o.status,
          c.nama AS customer, c.alamat
   FROM payments p
   JOIN orders o ON p.order_id = o.order_id
   JOIN customer c ON o.customer_id = c.customer_id
-  WHERE 1=1
+  WHERE o.status IN ('proses', 'selesai')
 ";
 
 if (!empty($search)) {
@@ -67,16 +35,44 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
   <style>
     /* Gaya untuk menyembunyikan tombol saat cetak */
     @media print {
-
       .no-print,
       .no-print * {
         display: none !important;
       }
-
+      
+      .hide-on-print {
+        display: none !important;
+      }
+      
+      body {
+        background-color: white !important;
+        color: black !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
       .struk-card {
         page-break-after: always;
         border: 1px solid #d1d5db;
-        margin-bottom: 20px;
+        margin: 0;
+        box-shadow: none;
+        width: 100%;
+        max-width: 80mm;
+        margin: 0 auto;
+      }
+      
+      .bg-gray-800 {
+        background-color: white !important;
+        color: black !important;
+      }
+      
+      .bg-yellow-500 {
+        background-color: #000 !important;
+        color: white !important;
+      }
+      
+      .text-gray-400 {
+        color: #666 !important;
       }
     }
 
@@ -96,14 +92,74 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
     .status-selesai {
       @apply bg-green-500 text-white;
     }
+    
+    /* Gaya khusus untuk struk */
+    .struk-card {
+      width: 100%;
+      max-width: 80mm;
+      margin: 0;
+    }
+    
+    .struk-header {
+      border-bottom: 2px dashed #000;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .struk-footer {
+      border-top: 2px dashed #000;
+      padding-top: 10px;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    
+    .struk-title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+    
+    .struk-detail {
+      margin-bottom: 3px;
+      font-size: 0.9rem;
+    }
+    
+    .struk-detail-label {
+      font-weight: bold;
+      display: inline-block;
+      width: 100px;
+    }
+    
+    .total-amount {
+      font-weight: bold;
+      font-size: 1.1rem;
+      text-align: right;
+      margin-top: 10px;
+    }
+    
+    /* Gaya untuk layout responsif */
+    .struk-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: flex-start;
+    }
+    
+    @media (max-width: 768px) {
+      .struk-container {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
   </style>
 </head>
 
 <body class="bg-gray-900 text-white p-6">
-  <h1 class="text-2xl font-bold text-yellow-400 mb-6">History Pembayaran</h1>
+  <h1 class="text-2xl font-bold text-yellow-400 mb-6 no-print">History Pembayaran</h1>
 
   <!-- Form Pencarian -->
-  <!-- Form pencarian (tanpa tombol Cetak Semua) -->
   <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 no-print">
     <div class="md:col-span-3">
       <input type="text" name="search" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" placeholder="Cari berdasarkan nama customer" value="<?= htmlspecialchars($search) ?>">
@@ -115,28 +171,17 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
     </div>
   </form>
 
-  <!-- Form Edit (Muncul hanya saat mode edit) -->
-  <?php if ($edit): ?>
-    <div class="bg-gray-800 rounded-lg shadow p-6 mb-8 no-print">
-      <h2 class="text-xl font-semibold text-yellow-400 mb-4">Edit Struk ID: <?= $edit['payment_id'] ?></h2>
-      <form method="POST" class="space-y-4">
-        <input type="hidden" name="payment_id" value="<?= $edit['payment_id'] ?>">
-        <!-- ... (bagian form edit tetap sama) ... -->
-      </form>
-    </div>
-  <?php endif; ?>
-
   <!-- Daftar Struk -->
-  <div class="space-y-4">
+  <div class="struk-container">
     <?php while ($row = mysqli_fetch_assoc($result)) : ?>
       <div class="bg-gray-800 rounded-lg shadow overflow-hidden struk-card" id="struk-<?= $row['payment_id'] ?>">
         <!-- Header Struk -->
-        <div class="bg-yellow-500 text-gray-900 px-4 py-3 flex justify-between items-center">
+        <div class="bg-yellow-500 text-gray-900 px-4 py-3 flex justify-between items-center no-print">
           <div>
             <strong>Struk ID: <?= $row['payment_id'] ?></strong> |
             <?= date('d/m/Y H:i', strtotime($row['tanggal_bayar'])) ?>
           </div>
-          <button class="bg-gray-900 hover:bg-gray-700 text-yellow-400 px-3 py-1 rounded text-sm no-print"
+          <button class="bg-gray-900 hover:bg-gray-700 text-yellow-400 px-3 py-1 rounded text-sm"
             onclick="printStruk('struk-<?= $row['payment_id'] ?>')">
             🖨 Cetak
           </button>
@@ -144,36 +189,51 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
 
         <!-- Isi Struk -->
         <div class="p-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p class="mb-2"><span class="text-gray-400">Order ID:</span> <strong><?= $row['order_id'] ?></strong></p>
-              <p class="mb-2"><span class="text-gray-400">Customer:</span> <?= $row['customer'] ?></p>
-              <p class="mb-2"><span class="text-gray-400">Alamat:</span> <?= $row['alamat'] ?></p>
-              <p class="mb-2"><span class="text-gray-400">Metode:</span> <?= $row['metode'] ?></p>
+          <div class="struk-header">
+            <div class="struk-title">STRUK PEMBAYARAN</div>
+            <div class="text-center text-sm mb-2"><?= date('d/m/Y H:i', strtotime($row['tanggal_bayar'])) ?></div>
+          </div>
+          
+          <div class="mb-4">
+            <div class="struk-detail">
+              <span class="struk-detail-label">No. Transaksi:</span> <?= $row['payment_id'] ?>
             </div>
-            <div>
-              <p class="mb-2"><span class="text-gray-400">Jumlah:</span> $ <?= number_format($row['jumlah_dibayar'], 0, ',', '.') ?></p>
-              <p class="mb-2"><span class="text-gray-400">Status:</span>
-                <span class="status-badge <?= $row['status'] === 'pending' ? 'status-pending' : ($row['status'] === 'proses' ? 'status-proses' : 'status-selesai') ?>">
-                  <?= ucfirst($row['status']) ?>
-                </span>
-              </p>
-              <p class="mb-2"><span class="text-gray-400">Order Date:</span> <?= date('d/m/Y H:i', strtotime($row['tgl_order'])) ?></p>
-              <p class="mb-2"><span class="text-gray-400">Total:</span> $ <?= number_format($row['total_harga'], 0, ',', '.') ?></p>
+            <div class="struk-detail">
+              <span class="struk-detail-label">Order ID:</span> <?= $row['order_id'] ?>
+            </div>
+            <div class="struk-detail">
+              <span class="struk-detail-label">Customer:</span> <?= $row['customer'] ?>
+            </div>
+            <div class="struk-detail">
+              <span class="struk-detail-label">Alamat:</span> <?= $row['alamat'] ?>
+            </div>
+            <div class="struk-detail">
+              <span class="struk-detail-label">Metode Bayar:</span> <?= $row['metode'] ?>
+            </div>
+            <!-- Status hanya ditampilkan di tampilan web, tidak di print -->
+            <div class="struk-detail no-print">
+              <span class="struk-detail-label">Status:</span>
+              <span class="status-badge <?= $row['status'] === 'pending' ? 'status-pending' : ($row['status'] === 'proses' ? 'status-proses' : 'status-selesai') ?>">
+                <?= ucfirst($row['status']) ?>
+              </span>
             </div>
           </div>
-
-          <!-- Tombol Aksi (Tidak Muncul Saat Cetak) -->
-          <div class="mt-4 flex space-x-2 no-print">
-            <a href="struk_admin.php?edit=<?= $row['payment_id'] ?>"
-              class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-              Edit
-            </a>
-            <a href="struk_admin.php?hapus=<?= $row['payment_id'] ?>"
-              onclick="return confirm('Yakin hapus struk ini?')"
-              class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
-              Hapus
-            </a>
+          
+          <div class="mb-4">
+            <div class="struk-detail">
+              <span class="struk-detail-label">Tgl. Order:</span> <?= date('d/m/Y H:i', strtotime($row['tgl_order'])) ?>
+            </div>
+            <div class="struk-detail">
+              <span class="struk-detail-label">Jumlah Bayar:</span> $ <?= number_format($row['jumlah_dibayar'], 0, ',', '.') ?>
+            </div>
+            <div class="total-amount">
+              <span class="struk-detail-label">Total Harga:</span> $ <?= number_format($row['total_harga'], 0, ',', '.') ?>
+            </div>
+          </div>
+          
+          <div class="struk-footer">
+            Terima kasih atas pembayarannya<br>
+            Stryk Admin &copy; <?= date('Y') ?>
           </div>
         </div>
       </div>
@@ -186,28 +246,66 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
       const struk = document.getElementById(id);
       const strukClone = struk.cloneNode(true); // Clone elemen struk
 
-      // Hapus semua elemen dengan class no-print dari clone
-      const noPrintElements = strukClone.querySelectorAll('.no-print');
-      noPrintElements.forEach(el => el.remove());
+      // Hapus semua elemen dengan class no-print dan hide-on-print dari clone
+      const elementsToRemove = strukClone.querySelectorAll('.no-print, .hide-on-print');
+      elementsToRemove.forEach(el => el.remove());
 
-      const win = window.open('', '', 'width=800,height=600');
+      const win = window.open('', '', 'width=350,height=600');
       win.document.write(`
         <html>
           <head>
-            <title>Struk Pembayaran</title>
-            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+            <title>Struk Pembayaran #${id.replace('struk-', '')}</title>
             <style>
-              @page { margin: 5mm; }
-              body { background: white; color: black; font-family: Arial; }
-              .status-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-              .status-pending { background-color: #eab308; color: #111827; }
-              .status-proses { background-color: #3b82f6; color: white; }
-              .status-selesai { background-color: #10b981; color: white; }
-              .struk-card { border: 1px solid #d1d5db; margin-bottom: 20px; }
+              @page { 
+                size: 80mm auto;
+                margin: 0;
+              }
+              body { 
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                padding: 5mm;
+                margin: 0;
+                width: 80mm;
+              }
+              .struk-card {
+                width: 100%;
+                margin: 0 auto;
+              }
+              .struk-header {
+                border-bottom: 2px dashed #000;
+                padding-bottom: 5px;
+                margin-bottom: 5px;
+                text-align: center;
+              }
+              .struk-footer {
+                border-top: 2px dashed #000;
+                padding-top: 5px;
+                margin-top: 5px;
+                text-align: center;
+                font-size: 10px;
+              }
+              .struk-title {
+                font-weight: bold;
+                font-size: 14px;
+                margin-bottom: 3px;
+              }
+              .struk-detail {
+                margin-bottom: 2px;
+              }
+              .struk-detail-label {
+                font-weight: bold;
+                display: inline-block;
+                width: 80px;
+              }
+              .total-amount {
+                font-weight: bold;
+                text-align: right;
+                margin-top: 5px;
+              }
             </style>
           </head>
-          <body onload="window.print(); setTimeout(() => window.close(), 100);">
-            <div class="max-w-md mx-auto p-4">${strukClone.innerHTML}</div>
+          <body onload="window.print(); setTimeout(() => window.close(), 500);">
+            ${strukClone.innerHTML}
           </body>
         </html>
       `);

@@ -5,6 +5,11 @@ if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
 
+$order_id = filter_input(INPUT_GET, 'order_id', FILTER_VALIDATE_INT);
+if ($order_id === null || $order_id <= 0) {
+    die("ID Order tidak valid");
+}
+
 // Definisi konstanta tracking steps
 define('TRACKING_STEPS', [
     'Pesanan masuk',
@@ -102,32 +107,32 @@ try {
     $tracking_history = mysqli_stmt_get_result($tracking_query)->fetch_all(MYSQLI_ASSOC);
 
     // Determine next available statuses
-    $completed_steps = array_column($tracking_history, 'status');
-    $last_status = end($completed_steps);
+$completed_steps = array_column($tracking_history, 'status');
+$last_status = end($completed_steps);
 
-    if (empty($completed_steps)) {
-        $next_statuses = ['Pesanan diterima'];
-    } elseif ($last_status === 'Pesanan diterima') {
-        $next_statuses = ['Pesanan diproses'];
-    } elseif ($last_status === 'Pesanan diproses') {
-        $next_statuses = ['Pesanan dikemas'];
-    } elseif ($last_status === 'Pesanan dikemas') {
-        $next_statuses = ['Pesanan dikirim ke gerai'];
-    } elseif ($last_status === 'Pesanan dikirim ke gerai') {
-        $next_statuses = ['Pesanan sampai di gerai'];
-    } elseif ($last_status === 'Pesanan sampai di gerai') {
-        $next_statuses = ['Pesanan keluar dari gerai', 'Pesanan sampai di gerai'];
-    } elseif ($last_status === 'Pesanan keluar dari gerai') {
-        $next_statuses = [
-            'Pesanan dikirim ke gerai', 
-            'Pesanan sampai di gerai',
-            'Pesanan dikirim ke customer'
-        ];
-    } elseif ($last_status === 'Pesanan dikirim ke customer') {
-        $next_statuses = ['Pesanan diterima customer'];
-    } else {
-        $next_statuses = [];
-    }
+if (empty($completed_steps)) {
+    $next_statuses = ['Pesanan diterima'];
+} elseif ($last_status === 'Pesanan diterima') {
+    $next_statuses = ['Pesanan diproses'];
+} elseif ($last_status === 'Pesanan diproses') {
+    $next_statuses = ['Pesanan dikemas'];
+} elseif ($last_status === 'Pesanan dikemas') {
+    $next_statuses = ['Pesanan dikirim ke gerai'];
+} elseif ($last_status === 'Pesanan dikirim ke gerai') {
+    $next_statuses = ['Pesanan sampai di gerai'];
+} elseif ($last_status === 'Pesanan sampai di gerai') {
+    $next_statuses = ['Pesanan keluar dari gerai', 'Pesanan sampai di gerai'];
+} elseif ($last_status === 'Pesanan keluar dari gerai') {
+    $next_statuses = [
+        'Pesanan dikirim ke gerai', 
+        'Pesanan sampai di gerai',
+        'Pesanan dikirim ke customer'
+    ];
+} elseif ($last_status === 'Pesanan dikirim ke customer') {
+    $next_statuses = ['Pesanan diterima customer'];
+} else {
+    $next_statuses = [];
+}
 
 } catch (Exception $e) {
     $error_message = $e->getMessage();
