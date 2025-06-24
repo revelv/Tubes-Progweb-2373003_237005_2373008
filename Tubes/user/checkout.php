@@ -39,10 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
     }
 
-    $ongkir = $total * 0.01;
-    $grand_total = $total + $ongkir;
-    $tanggal = date("Y-m-d H:i:s");
-    $status = 'pending';
+    if ($payment_method === 'Transfer') {
+        $ongkir = $total * 0.01;
+        $grand_total = $total + $ongkir;
+        $tanggal = date("Y-m-d H:i:s");
+        $status = 'pending';
+    } elseif ($payment_method === 'QRIS') {
+        $ongkir = $total * 0.01;
+        $grand_total = $total + $ongkir;
+        $tanggal = date("Y-m-d H:i:s");
+        $status = 'proses';
+    }
 
     // Insert order
     $sql_order = "INSERT INTO orders (customer_id, tgl_order, total_harga, status) 
@@ -103,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         mysqli_query($conn, "INSERT INTO payments 
             (order_id, metode, jumlah_dibayar, tanggal_bayar, payment_proof, payment_status) 
-            VALUES ('$order_id', 'QRIS', '$grand_total', '$tanggal', '$qris_code', 'pending')");
+            VALUES ('$order_id', 'QRIS', '$grand_total', '$tanggal', '$qris_code', 'proses')");
     }
 
     // Bersihkan cart
@@ -115,4 +122,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>";
     exit;
 }
-?>

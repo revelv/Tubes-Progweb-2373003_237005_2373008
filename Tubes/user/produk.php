@@ -8,9 +8,6 @@ include 'header.php';
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="./css/produk.css">
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
-	<!-- Bootstrap CSS -->
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<title>Styrk Industries</title>
 </head>
 
@@ -20,24 +17,23 @@ include 'header.php';
 		const isLoggedIn = <?= isset($_SESSION['kd_cs']) ? 'true' : 'false'; ?>;
 	</script>
 
-	<div class="container_produk">
-		<h2 id="judul">Our Products</h2>
-	</div>
 
 	<div class="container_produk mb-4">
 		<form method="GET" class="row g-3 align-items-center">
 			<div class="col-auto">
 				<label for="kategori" class="col-form-label">Filter by Category:</label>
 			</div>
+
 			<div class="col-auto">
 				<select name="kategori" id="kategori" class="form-select">
 					<option value="">All Categories</option>
 					<?php
-					$kategori_result = mysqli_query($conn, "SELECT DISTINCT category FROM category");
+					$kategori_result = mysqli_query($conn, "SELECT category_id, category FROM category ORDER BY category");
 					while ($kategori = mysqli_fetch_assoc($kategori_result)) {
-						$selected = (isset($_GET['kategori']) && $_GET['kategori'] == $kategori['category']) ? 'selected' : '';
-						echo "<option value=\"" . htmlspecialchars($kategori['category'], ENT_QUOTES) . "\" $selected>" . htmlspecialchars($kategori['category']) . "</option>";
+						$selected = (isset($_GET['kategori']) && $_GET['kategori'] == $kategori['category_id']) ? 'selected' : '';
+						echo "<option value=\"" . $kategori['category_id'] . "\" $selected>" . htmlspecialchars($kategori['category']) . "</option>";
 					}
+
 					?>
 				</select>
 			</div>
@@ -57,11 +53,11 @@ include 'header.php';
 	</div>
 
 	<div class="container_produk mb-4">
+
+		<h2 id="judul">Our Products</h2>
 		<div class="text-center">
-            <h1 class="section-heading text-uppercase">Recommendations</h1>
-            <h3 class="section-subheading text-muted"><small> out our featured products!</small></h3>
-			<br>
-        </div>
+			<h2 class="section-heading text-uppercase">Recommendations</h2>
+		</div>
 		<div class="row">
 			<?php
 			// Query untuk mendapatkan 3 produk dengan stok terbanyak DAN terlama (product_id ASC)
@@ -89,7 +85,6 @@ include 'header.php';
 						<div class="caption">
 							<h3><?= $rec_row['nama_produk']; ?></h3>
 							<h4>$<?= $rec_row['harga']; ?></h4>
-							<p><strong>Stock:</strong> <?= $rec_row['stok']; ?></p>
 						</div>
 
 						<div class="button">
@@ -134,20 +129,24 @@ include 'header.php';
 
 			if (!empty($_GET['kategori'])) {
 				$kategori = mysqli_real_escape_string($conn, $_GET['kategori']);
-				$where[] = "category_id = '$kategori'";
+				$where[] = "products.category_id = '$kategori'";
 			}
 
 			if (!empty($_GET['search'])) {
 				$search = mysqli_real_escape_string($conn, $_GET['search']);
-				$where[] = "nama_produk LIKE '%$search%'";
+				$where[] = "products.nama_produk LIKE '%$search%'";
 			}
 
-			$where_clause = '';
-			if (count($where) > 0) {
-				$where_clause = 'WHERE ' . implode(' AND ', $where);
-			}
+			$where_clause = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
-			$result = mysqli_query($conn, "SELECT * FROM products $where_clause");
+			$query = "SELECT products.*, category.category 
+		  FROM products 
+		  JOIN category ON products.category_id = category.category_id 
+		  $where_clause";
+
+			$result = mysqli_query($conn, $query);
+
+
 
 			while ($row = mysqli_fetch_assoc($result)) {
 			?>
@@ -279,10 +278,10 @@ include 'header.php';
 				audioElement.pause();
 				audioElement.currentTime = 0;
 
-				if (kategori === 'Switch_kit') {
+				if (kategori === '7') {
 					audioElement.src = '../sounds/switch_sound.mp3';
 					audioContainer.style.display = 'block';
-				} else if (kategori === 'Keyboard') {
+				} else if (kategori === '2') {
 					audioElement.src = '../sounds/keyboard_sound.mp3';
 					audioContainer.style.display = 'block';
 				} else {
