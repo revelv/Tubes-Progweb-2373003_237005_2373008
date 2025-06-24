@@ -11,15 +11,39 @@ include 'koneksi.php';
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Stryk Admin Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    .logout-btn {
+      background-color: #ef4444;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+    .logout-btn:hover {
+      background-color: #dc2626;
+      transform: translateY(-1px);
+    }
+    .logout-btn svg {
+      margin-right: 0.5rem;
+    }
+  </style>
 </head>
 <body class="bg-gray-900 text-white font-sans">
-  <nav class="bg-gray-800 px-6 py-4">
+  <nav class="bg-gray-800 px-6 py-4 flex justify-between items-center">
     <h1 class="text-xl font-bold text-yellow-400">Stryk Industries - Admin Panel</h1>
+    <a href="logout_admin.php" class="logout-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
+      Logout
+    </a>
   </nav>
   
   <main class="p-6">
     <h2 class="text-2xl text-yellow-400">Selamat datang di Admin Panel Stryk Industries</h2>
-    <a href="logout_admin.php">Logout</a>
     <p class="mt-2 text-gray-300">Silakan pilih menu di bawah untuk mengelola data:</p>
     
     <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

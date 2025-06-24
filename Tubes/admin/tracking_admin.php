@@ -38,16 +38,18 @@ try {
     }
 
     // Validasi order
-    $order_query = mysqli_prepare($conn, 
+    $order_query = mysqli_prepare(
+        $conn,
         "SELECT o.*, c.nama AS customer_name 
          FROM orders o 
          JOIN customer c ON o.customer_id = c.customer_id 
-         WHERE o.order_id = ?");
-    
+         WHERE o.order_id = ?"
+    );
+
     if (!$order_query) {
         throw new Exception("Query error: " . mysqli_error($conn));
     }
-    
+
     mysqli_stmt_bind_param($order_query, "i", $order_id);
     mysqli_stmt_execute($order_query);
     $order = mysqli_stmt_get_result($order_query)->fetch_assoc();
@@ -60,80 +62,84 @@ try {
     if (isset($_POST['update_tracking'])) {
         $status = $_POST['status'] ?? '';
         $description = $_POST['description'] ?? null;
-        
+
         if (empty($status)) {
             throw new Exception("Status tidak boleh kosong");
         }
 
         // Insert tracking data
-        $insert_query = mysqli_prepare($conn, 
+        $insert_query = mysqli_prepare(
+            $conn,
             "INSERT INTO order_tracking (order_id, status, description) 
-             VALUES (?, ?, ?)");
-        
+             VALUES (?, ?, ?)"
+        );
+
         if (!$insert_query) {
             throw new Exception("Prepare error: " . mysqli_error($conn));
         }
-        
+
         mysqli_stmt_bind_param($insert_query, "iss", $order_id, $status, $description);
-        
+
         if (!mysqli_stmt_execute($insert_query)) {
             throw new Exception("Execute error: " . mysqli_stmt_error($insert_query));
         }
 
         // Update order status if final step
         if ($status === 'Pesanan diterima customer') {
-            mysqli_query($conn, 
+            mysqli_query(
+                $conn,
                 "UPDATE orders SET status = 'selesai' 
-                 WHERE order_id = $order_id");
+                 WHERE order_id = $order_id"
+            );
         }
-        
+
         // Redirect to avoid form resubmission
         header("Location: tracking_admin.php?order_id=$order_id&success=1");
         exit();
     }
 
     // Get tracking history
-    $tracking_query = mysqli_prepare($conn, 
+    $tracking_query = mysqli_prepare(
+        $conn,
         "SELECT * FROM order_tracking 
          WHERE order_id = ? 
-         ORDER BY timestamp ASC");
-    
+         ORDER BY timestamp ASC"
+    );
+
     if (!$tracking_query) {
         throw new Exception("Query error: " . mysqli_error($conn));
     }
-    
+
     mysqli_stmt_bind_param($tracking_query, "i", $order_id);
     mysqli_stmt_execute($tracking_query);
     $tracking_history = mysqli_stmt_get_result($tracking_query)->fetch_all(MYSQLI_ASSOC);
 
     // Determine next available statuses
-$completed_steps = array_column($tracking_history, 'status');
-$last_status = end($completed_steps);
+    $completed_steps = array_column($tracking_history, 'status');
+    $last_status = end($completed_steps);
 
-if (empty($completed_steps)) {
-    $next_statuses = ['Pesanan diterima'];
-} elseif ($last_status === 'Pesanan diterima') {
-    $next_statuses = ['Pesanan diproses'];
-} elseif ($last_status === 'Pesanan diproses') {
-    $next_statuses = ['Pesanan dikemas'];
-} elseif ($last_status === 'Pesanan dikemas') {
-    $next_statuses = ['Pesanan dikirim ke gerai'];
-} elseif ($last_status === 'Pesanan dikirim ke gerai') {
-    $next_statuses = ['Pesanan sampai di gerai'];
-} elseif ($last_status === 'Pesanan sampai di gerai') {
-    $next_statuses = ['Pesanan keluar dari gerai', 'Pesanan sampai di gerai'];
-} elseif ($last_status === 'Pesanan keluar dari gerai') {
-    $next_statuses = [
-        'Pesanan dikirim ke gerai', 
-        'Pesanan sampai di gerai',
-        'Pesanan dikirim ke customer'
-    ];
-} elseif ($last_status === 'Pesanan dikirim ke customer') {
-    $next_statuses = ['Pesanan diterima customer'];
-} else {
-    $next_statuses = [];
-}
-
+    if (empty($completed_steps)) {
+        $next_statuses = ['Pesanan diterima'];
+    } elseif ($last_status === 'Pesanan diterima') {
+        $next_statuses = ['Pesanan diproses'];
+    } elseif ($last_status === 'Pesanan diproses') {
+        $next_statuses = ['Pesanan dikemas'];
+    } elseif ($last_status === 'Pesanan dikemas') {
+        $next_statuses = ['Pesanan dikirim ke gerai'];
+    } elseif ($last_status === 'Pesanan dikirim ke gerai') {
+        $next_statuses = ['Pesanan sampai di gerai'];
+    } elseif ($last_status === 'Pesanan sampai di gerai') {
+        $next_statuses = ['Pesanan keluar dari gerai'];
+    } elseif ($last_status === 'Pesanan keluar dari gerai') {
+        $next_statuses = [
+            'Pesanan dikirim ke gerai',
+            'Pesanan dikirim ke customer'
+        ];
+    } elseif ($last_status === 'Pesanan dikirim ke customer') {
+        $next_statuses = ['Pesanan diterima customer'];
+    } else {
+        $next_statuses = [];
+    }
 } catch (Exception $e) {
     $error_message = $e->getMessage();
 }
@@ -141,6 +147,7 @@ if (empty($completed_steps)) {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -151,20 +158,25 @@ if (empty($completed_steps)) {
         .timeline-dot {
             @apply flex-shrink-0 w-4 h-4 rounded-full bg-gray-600;
         }
+
         .timeline-dot.active {
             @apply bg-green-500;
         }
+
         .timeline-connector {
             @apply flex-shrink-0 w-0.5 h-6 bg-gray-600 mx-auto;
         }
+
         .timeline-connector.active {
             @apply bg-green-500;
         }
+
         .form-input-dark {
             @apply bg-gray-700 border-gray-600 text-white focus:ring-yellow-500 focus:border-yellow-500;
         }
     </style>
 </head>
+
 <body class="bg-gray-900 text-gray-100">
     <div class="container mx-auto p-4 max-w-4xl">
         <?php if (!empty($error_message)) : ?>
@@ -186,14 +198,12 @@ if (empty($completed_steps)) {
                         <div class="flex items-center mt-2 text-gray-400">
                             <span><i class="fas fa-user mr-1"></i> <?= htmlspecialchars($order['customer_name']) ?></span>
                             <span class="mx-3 text-gray-600">|</span>
-                            <span class="font-medium <?= 
-                                $order['status'] === 'proses' ? 'text-blue-400' : 
-                                ($order['status'] === 'selesai' ? 'text-green-400' : 'text-yellow-400')
-                            ?>">
-                                <i class="fas fa-<?= 
-                                    $order['status'] === 'proses' ? 'cog' : 
-                                    ($order['status'] === 'selesai' ? 'check-circle' : 'clock')
-                                ?> mr-1"></i>
+                            <span class="font-medium <?=
+                                                        $order['status'] === 'proses' ? 'text-blue-400' : ($order['status'] === 'selesai' ? 'text-green-400' : 'text-yellow-400')
+                                                        ?>">
+                                <i class="fas fa-<?=
+                                                    $order['status'] === 'proses' ? 'cog' : ($order['status'] === 'selesai' ? 'check-circle' : 'clock')
+                                                    ?> mr-1"></i>
                                 <?= ucfirst($order['status']) ?>
                             </span>
                         </div>
@@ -217,7 +227,7 @@ if (empty($completed_steps)) {
                 <h2 class="text-xl font-semibold text-yellow-400 mb-4 flex items-center">
                     <i class="fas fa-history mr-2"></i> Riwayat Pengiriman
                 </h2>
-                
+
                 <?php if (!empty($tracking_history)) : ?>
                     <div class="space-y-6 pl-2">
                         <?php foreach ($tracking_history as $index => $track) : ?>
@@ -230,10 +240,9 @@ if (empty($completed_steps)) {
                                 </div>
                                 <div class="flex-grow pb-6 group-hover:bg-gray-700/50 rounded-lg px-3 py-2 transition-colors">
                                     <p class="font-medium text-white flex items-center">
-                                        <i class="fas fa-<?= 
-                                            strpos($track['status'], 'diterima') !== false ? 'check' : 
-                                            (strpos($track['status'], 'dikirim') !== false ? 'shipping-fast' : 'box')
-                                        ?> mr-2 text-gray-400"></i>
+                                        <i class="fas fa-<?=
+                                                            strpos($track['status'], 'diterima') !== false ? 'check' : (strpos($track['status'], 'dikirim') !== false ? 'shipping-fast' : 'box')
+                                                            ?> mr-2 text-gray-400"></i>
                                         <?= htmlspecialchars($track['status']) ?>
                                     </p>
                                     <p class="text-sm text-gray-400 mt-1 ml-6">
@@ -287,14 +296,14 @@ if (empty($completed_steps)) {
                     <h2 class="text-xl font-semibold text-yellow-400 mb-4 flex items-center">
                         <i class="fas fa-edit mr-2"></i> Update Status Tracking
                     </h2>
-                    
+
                     <form method="POST" class="space-y-4">
                         <div>
                             <label class="block text-gray-300 mb-2 flex items-center">
                                 <i class="fas fa-tag mr-2"></i> Status
                             </label>
-                            <select name="status" style="background-color: #2c3545; color: #f0f0f0; border: 1px solid #444;" required 
-                                    class="w-full px-4 py-2 form-input-dark rounded-lg">
+                            <select name="status" style="background-color: #2c3545; color: #f0f0f0; border: 1px solid #444;" required
+                                class="w-full px-4 py-2 form-input-dark rounded-lg">
                                 <option value="">-- Pilih Status --</option>
                                 <?php foreach ($next_statuses as $status) : ?>
                                     <option value="<?= htmlspecialchars($status) ?>">
@@ -303,23 +312,23 @@ if (empty($completed_steps)) {
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        
+
                         <div>
                             <label class="block text-gray-300 mb-2 flex items-center">
                                 <i class="fas fa-align-left mr-2"></i> Keterangan (Opsional)
                             </label>
                             <textarea name="description" style="background-color: #2c3545; color: #f0f0f0; border: 1px solid #444;" rows="3"
-                                    class="w-full px-4 py-2 form-input-dark rounded-lg"
-                                    placeholder=" "></textarea>
+                                class="w-full px-4 py-2 form-input-dark rounded-lg"
+                                placeholder=" "></textarea>
                         </div>
-                        
+
                         <div class="flex space-x-3 pt-2">
                             <button type="submit" name="update_tracking"
-                                    class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg transition flex items-center">
+                                class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg transition flex items-center">
                                 <i class="fas fa-save mr-2"></i> Update Status
                             </button>
                             <button type="reset"
-                                    class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition flex items-center">
+                                class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition flex items-center">
                                 <i class="fas fa-undo mr-2"></i> Reset
                             </button>
                         </div>
@@ -333,11 +342,24 @@ if (empty($completed_steps)) {
         .pulse-animation {
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
         }
     </style>
 </body>
+
 </html>

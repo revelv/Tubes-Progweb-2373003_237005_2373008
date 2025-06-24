@@ -10,7 +10,6 @@ $customer_id = $_SESSION['kd_cs'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Cek metode pembayaran
     $payment_method = $_POST['metode'] ?? '';
 
     // Ambil data cart
@@ -39,19 +38,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
     }
 
-    if ($payment_method === 'Transfer') {
+    // VALIDASI dan SET nilai variabel penting
+    if ($payment_method === 'Transfer' || $payment_method === 'QRIS') {
         $ongkir = $total * 0.01;
         $grand_total = $total + $ongkir;
         $tanggal = date("Y-m-d H:i:s");
-        $status = 'pending';
-    } elseif ($payment_method === 'QRIS') {
-        $ongkir = $total * 0.01;
-        $grand_total = $total + $ongkir;
-        $tanggal = date("Y-m-d H:i:s");
-        $status = 'proses';
+        $status = ($payment_method === 'Transfer') ? 'pending' : 'proses';
+    } else {
+        die("Metode pembayaran tidak valid.");
     }
 
-    // Insert order
+    // INSERT orders
     $sql_order = "INSERT INTO orders (customer_id, tgl_order, total_harga, status) 
                   VALUES ('$customer_id', '$tanggal', '$grand_total', '$status')";
     mysqli_query($conn, $sql_order);
