@@ -19,22 +19,38 @@ if (isset($_GET['edit'])) {
 
 // --- Simpan Perubahan Edit Produk ---
 if (isset($_POST['update'])) {
-  $id = $_POST['product_id'];
+  $id_lama = $_POST['old_product_id']; // hidden input
+  $id_baru = $_POST['product_id'];
   $nama = $_POST['nama_produk'];
   $deskripsi_produk = $_POST['deskripsi_produk'];
   $harga = $_POST['harga'];
   $stok = $_POST['stok'];
-  $kategori = intval($_POST['category']);
+  $kategori = $_POST['category'];
   $gambar = $_POST['link_gambar'];
 
+  // ✅ Cek apakah nama produk di kategori ini sudah dipakai oleh produk lain
+  $cek = mysqli_query($conn, "
+    SELECT * FROM products 
+    WHERE nama_produk = '" . mysqli_real_escape_string($conn, $nama) . "'
+    AND category_id = " . intval($kategori) . "
+    AND product_id != '" . mysqli_real_escape_string($conn, $id_lama) . "'
+  ");
+
+  if (mysqli_num_rows($cek) > 0) {
+    echo "<script>alert('Nama produk sudah ada di kategori ini.'); window.location='produk_admin.php';</script>";
+    exit;
+  }
+
+  // ✅ Update jika tidak duplikat
   $query = "UPDATE products SET 
-    nama_produk='" . mysqli_real_escape_string($conn, $nama) . "',
-    deskripsi_produk='" . mysqli_real_escape_string($conn, $deskripsi_produk) . "',
-    harga='" . mysqli_real_escape_string($conn, $harga) . "',
-    stok=" . intval($stok) . ",
-    category_id=" . $kategori . ",
-    link_gambar='" . mysqli_real_escape_string($conn, $gambar) . "'
-    WHERE product_id='" . mysqli_real_escape_string($conn, $id) . "'";
+    product_id = '" . mysqli_real_escape_string($conn, $id_baru) . "',
+    nama_produk = '" . mysqli_real_escape_string($conn, $nama) . "',
+    deskripsi_produk = '" . mysqli_real_escape_string($conn, $deskripsi_produk) . "',
+    harga = '" . mysqli_real_escape_string($conn, $harga) . "',
+    stok = " . intval($stok) . ",
+    category_id = " . intval($kategori) . ",
+    link_gambar = '" . mysqli_real_escape_string($conn, $gambar) . "'
+    WHERE product_id = '" . mysqli_real_escape_string($conn, $id_lama) . "'";
 
   if (mysqli_query($conn, $query)) {
     echo "<script>alert('Produk berhasil diperbarui'); window.location='produk_admin.php';</script>";
@@ -42,6 +58,7 @@ if (isset($_POST['update'])) {
     echo "<script>alert('Error: " . mysqli_error($conn) . "');</script>";
   }
 }
+
 
 // --- Tambah Produk Baru ---
 if (isset($_POST['insert'])) {
@@ -52,6 +69,15 @@ if (isset($_POST['insert'])) {
   $stok = $_POST['stok'];
   $kategori = intval($_POST['category']);
   $gambar = $_POST['link_gambar'];
+
+  // Cek duplikat nama produk di kategori yang sama
+  $cek = mysqli_query($conn, "SELECT * FROM products WHERE nama_produk = '" . mysqli_real_escape_string($conn, $nama) . "' AND category_id = " . intval($kategori));
+
+  if (mysqli_num_rows($cek) > 0) {
+    echo "<script>alert('Nama produk sudah ada di kategori ini.'); window.location='produk_admin.php';</script>";
+    exit;
+  }
+
 
   $query = "INSERT INTO products (
     product_id, nama_produk, deskripsi_produk, harga, stok, category_id, link_gambar
@@ -140,8 +166,9 @@ $all_categories = mysqli_query($conn, "SELECT * FROM category ORDER BY category"
       <?= $edit ? "Edit Produk ID: {$edit['product_id']}" : 'Tambah Produk Baru' ?>
     </h2>
 
-    <form method="POST" class="space-y-4">
+     <form method="POST" class="space-y-4">
       <?php if ($edit): ?>
+        <input type="hidden" name="old_product_id" value="<?= $edit['product_id'] ?>">
         <input type="hidden" name="product_id" value="<?= $edit['product_id'] ?>">
       <?php endif; ?>
 
@@ -250,4 +277,5 @@ $all_categories = mysqli_query($conn, "SELECT * FROM category ORDER BY category"
   </div>
 
 </body>
+
 </html>
