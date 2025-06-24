@@ -28,6 +28,32 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
 <html lang="id">
 
 <head>
+  <style>
+  @media print {
+    .watermark-print {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      align-content: space-around;
+      z-index: -1;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    .wm {
+      font-size: 24px;
+      transform: rotate(-30deg);
+      width: 200px;
+      text-align: center;
+    }
+  }
+  </style>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>History Pembayaran - Stryk Industries</title>
@@ -244,11 +270,32 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
   <script>
     function printStruk(id) {
       const struk = document.getElementById(id);
-      const strukClone = struk.cloneNode(true); // Clone elemen struk
+      const strukClone = struk.cloneNode(true);
 
-      // Hapus semua elemen dengan class no-print dan hide-on-print dari clone
+      // Hapus elemen no-print
       const elementsToRemove = strukClone.querySelectorAll('.no-print, .hide-on-print');
       elementsToRemove.forEach(el => el.remove());
+
+      // Generate watermark dengan pola staggered yang rapi
+      let watermarkHTML = '<div class="watermark-print">';
+      const columns = 4; // Jumlah kolom
+      const rows = 8; // Jumlah baris
+      const offset = 120; // Jarak offset untuk efek staggered
+      
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < columns; j++) {
+          // Hitung posisi x dengan offset bergantian
+          const xPos = j * 200 + (i % 2 === 0 ? 0 : offset);
+          // Hitung posisi y
+          const yPos = i * 120;
+          
+          watermarkHTML += `
+            <div class="wm" style="left:${xPos}px; top:${yPos}px">
+              Stryk Industries
+            </div>`;
+        }
+      }
+      watermarkHTML += '</div>';
 
       const win = window.open('', '', 'width=350,height=600');
       win.document.write(`
@@ -266,10 +313,31 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
                 padding: 5mm;
                 margin: 0;
                 width: 80mm;
+                position: relative;
               }
               .struk-card {
                 width: 100%;
                 margin: 0 auto;
+                position: relative;
+                z-index: 1;
+              }
+              .watermark-print {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                opacity: 0.1;
+                pointer-events: none;
+              }
+              .wm {
+                position: absolute;
+                font-size: 24px;
+                transform: rotate(-30deg);
+                white-space: nowrap;
+                width: 180px;
+                text-align: center;
               }
               .struk-header {
                 border-bottom: 2px dashed #000;
@@ -306,6 +374,7 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
           </head>
           <body onload="window.print(); setTimeout(() => window.close(), 500);">
             ${strukClone.innerHTML}
+            ${watermarkHTML}
           </body>
         </html>
       `);
@@ -313,5 +382,4 @@ $orders = mysqli_query($conn, "SELECT orders.order_id, customer.nama FROM orders
     }
   </script>
 </body>
-
 </html>
