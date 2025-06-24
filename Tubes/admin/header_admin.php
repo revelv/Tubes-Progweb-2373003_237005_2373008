@@ -16,6 +16,7 @@
       <a href="customer_admin.php" class="hover:text-yellow-400">Customer</a>
       <a href="order_admin.php" class="hover:text-yellow-400">Order</a>
       <a href="struk_admin.php" class="hover:text-yellow-400">Struk</a>
+      <a href="logout_admin.php" class="text-red-400 hover:text-red-300">Logout</a>
     </div>
   </nav>
   </body>
