@@ -7,7 +7,7 @@ if (!$conn) {
 
 // Definisi konstanta tracking steps
 define('TRACKING_STEPS', [
-    'Pesanan diterima',
+    'Pesanan masuk',
     'Pesanan diproses',
     'Pesanan dikemas',
     'Pesanan dikirim ke gerai',
