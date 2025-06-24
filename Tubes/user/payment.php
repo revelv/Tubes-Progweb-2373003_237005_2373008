@@ -160,8 +160,9 @@ $total = 0;
                     <h5>Transfer Bank</h5>
                     <p>Silakan transfer ke rekening:</p>
                     <p><strong>BANK BCA 1234567890 a.n STYRK INDUSTRIES</strong></p>
-                    <form action="checkout.php" method="POST" enctype="multipart/form-data">
-                        <div class="mb-3">
+                    <form action="checkout.php" method="post" value = "Transfer" enctype="multipart/form-data">
+                    <input type="hidden" name="metode" value="Transfer">    
+                    <div class="mb-3">
                             <label for="bukti" class="form-label">Upload Bukti Transfer</label>
                             <input type="file" name="bukti" class="form-control" required accept="image/*">
                             <div class="form-text">Format: JPG, PNG (max 2MB)</div>

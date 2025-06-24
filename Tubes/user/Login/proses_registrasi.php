@@ -1,5 +1,6 @@
 <?php
 include '../koneksi.php';
+session_start();
 
 // Cek koneksi
 if ($conn->connect_error) {
@@ -34,12 +35,11 @@ if ($check_email->num_rows > 0) {
 
 $check_email->close();
 
-// Jika ada error, tampilkan dan hentikan proses
+// Jika ada error, simpan ke session lalu redirect balik ke form
 if (!empty($errors)) {
-    foreach ($errors as $error) {
-        echo "<div class='alert alert-danger'>$error</div>";
-    }
-    echo "<a href='javascript:history.back()'>Kembali</a>";
+    $_SESSION['register_error'] = implode('<br>', $errors);         
+    $_SESSION['form_data'] = $_POST;                                
+    header("Location: registrasi.php");                             
     exit;
 }
 
@@ -51,7 +51,7 @@ $stmt = $conn->prepare("INSERT INTO customer (nama, password, email, no_telepon,
 $stmt->bind_param("sssss", $nama, $hashed_password, $email, $no_telepon, $alamat);
 
 if ($stmt->execute()) {
-    header("Refresh: 3; url=produk.php");
+    header("Refresh: 3; url=../produk.php");
 } else {
     echo "<div class='alert alert-danger'>Error: " . $stmt->error . "</div>";
     echo "<a href='javascript:history.back()'>Kembali</a>";
