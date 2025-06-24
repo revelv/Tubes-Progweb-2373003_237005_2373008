@@ -7,7 +7,7 @@ include '../koneksi.php';
 
 // Normal page display
 $customer_id = $_SESSION['kd_cs'];
-$query = "SELECT carts.*, products.nama_produk, products.harga, products.harga_diskon, products.link_gambar 
+$query = "SELECT carts.*, products.nama_produk, products.harga, products.link_gambar 
           FROM carts 
           JOIN products ON carts.product_id = products.product_id 
           WHERE carts.customer_id = '$customer_id'";

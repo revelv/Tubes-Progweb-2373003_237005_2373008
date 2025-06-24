@@ -80,7 +80,7 @@ include 'header.php';
 							data-nama="<?= htmlspecialchars($rec_row['nama_produk'], ENT_QUOTES); ?>"
 							data-harga="<?= $rec_row['harga']; ?>"
 							data-stok="<?= $rec_row['stok']; ?>"
-							data-kategori="<?= $rec_row['category']; ?>"
+							data-kategori="<?= $rec_row['category_id']; ?>"
 							data-deskripsi="<?= htmlspecialchars($rec_row['deskripsi_produk'] ?? ''); ?>"
 							data-gambar="<?= $rec_row['link_gambar']; ?>">
 							<img id="gambar" src="<?= $rec_row['link_gambar']; ?>" alt="<?= $rec_row['nama_produk']; ?>">
@@ -134,7 +134,7 @@ include 'header.php';
 
 			if (!empty($_GET['kategori'])) {
 				$kategori = mysqli_real_escape_string($conn, $_GET['kategori']);
-				$where[] = "category = '$kategori'";
+				$where[] = "category_id = '$kategori'";
 			}
 
 			if (!empty($_GET['search'])) {
@@ -161,7 +161,7 @@ include 'header.php';
 							data-nama="<?= htmlspecialchars($row['nama_produk'], ENT_QUOTES); ?>"
 							data-harga="<?= $row['harga']; ?>"
 							data-stok="<?= $row['stok']; ?>"
-							data-kategori="<?= $row['category']; ?>"
+							data-kategori="<?= $row['category_id']; ?>"
 							data-deskripsi="<?= htmlspecialchars($row['deskripsi_produk'] ?? ''); ?>"
 							data-gambar="<?= $row['link_gambar']; ?>">
 							<img id="gambar" src="<?= $row['link_gambar']; ?>" alt="<?= $row['nama_produk']; ?>">
