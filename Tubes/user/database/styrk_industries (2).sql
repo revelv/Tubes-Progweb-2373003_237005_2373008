@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 24, 2025 at 03:50 PM
+-- Generation Time: Jun 25, 2025 at 12:01 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -112,8 +112,17 @@ CREATE TABLE `orders` (
   `customer_id` int NOT NULL,
   `tgl_order` datetime NOT NULL,
   `total_harga` decimal(12,2) NOT NULL,
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `status` enum('pending','proses','selesai','batal') COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`order_id`, `customer_id`, `tgl_order`, `total_harga`, `status`) VALUES
+(18, 7, '2025-06-24 23:40:55', 90.90, 'batal'),
+(19, 7, '2025-06-24 23:58:37', 663.87, 'batal'),
+(20, 7, '2025-06-24 23:59:39', 272.70, 'batal');
 
 -- --------------------------------------------------------
 
@@ -130,6 +139,16 @@ CREATE TABLE `order_details` (
   `subtotal` decimal(12,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `order_details`
+--
+
+INSERT INTO `order_details` (`detail_id`, `order_id`, `product_id`, `jumlah`, `harga_satuan`, `subtotal`) VALUES
+(22, 18, 'KB008', 1, 90.00, 90.00),
+(23, 19, 'KB010', 1, 299.00, 299.00),
+(24, 19, 'KB006', 1, 358.30, 358.30),
+(25, 20, 'KB008', 3, 90.00, 270.00);
+
 -- --------------------------------------------------------
 
 --
@@ -143,6 +162,15 @@ CREATE TABLE `order_tracking` (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `timestamp` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_tracking`
+--
+
+INSERT INTO `order_tracking` (`tracking_id`, `order_id`, `status`, `description`, `timestamp`) VALUES
+(1, 18, 'batal', 'Payment rejected, order canceled and stock restored', '2025-06-25 06:52:23'),
+(2, 19, 'batal', 'Pembayaran ditolak, silahkan belanja kembali.', '2025-06-25 06:59:07'),
+(3, 20, 'batal', 'Pembayaran ditolak, silahkan belanja kembali.', '2025-06-25 07:00:13');
 
 -- --------------------------------------------------------
 
@@ -159,6 +187,15 @@ CREATE TABLE `payments` (
   `payment_proof` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `payment_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`payment_id`, `order_id`, `metode`, `jumlah_dibayar`, `tanggal_bayar`, `payment_proof`, `payment_status`) VALUES
+(8, 18, 'Transfer Bank', 90.90, '2025-06-24 23:40:55', '../payment_proofs/proof_18_1750808455.png', 'rejected'),
+(9, 19, 'QRIS', 663.87, '2025-06-24 23:58:37', 'STYRK_ORDER19_811', 'rejected'),
+(10, 20, 'QRIS', 272.70, '2025-06-24 23:59:39', 'STYRK_ORDER20_747', 'rejected');
 
 -- --------------------------------------------------------
 
@@ -314,7 +351,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `cart_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -332,25 +369,25 @@ ALTER TABLE `customer`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `detail_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `detail_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `order_tracking`
 --
 ALTER TABLE `order_tracking`
-  MODIFY `tracking_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `tracking_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `payment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
