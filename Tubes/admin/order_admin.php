@@ -50,56 +50,95 @@ if (isset($_POST['insert'])) {
 if (isset($_POST['update_status'])) {
   $order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
   $status = mysqli_real_escape_string($conn, $_POST['status']);
-  
+
   // Mulai transaction
   mysqli_begin_transaction($conn);
-  
+
   try {
     // Jika status diubah menjadi "proses", buat struk pembayaran
     if ($status == 'proses') {
       // Cek apakah sudah ada pembayaran untuk order ini
       $cek_payment = mysqli_query($conn, "SELECT * FROM payments WHERE order_id='$order_id'");
       if (!$cek_payment) throw new Exception(mysqli_error($conn));
-      
+
       if (mysqli_num_rows($cek_payment) == 0) {
         // Jika belum ada, buat record pembayaran baru
         $order_data = mysqli_query($conn, "SELECT * FROM orders WHERE order_id='$order_id'");
         if (!$order_data) throw new Exception(mysqli_error($conn));
-        
+
         $order = mysqli_fetch_assoc($order_data);
         $metode = 'QRIS'; // Default payment method
         $jumlah = $order['total_harga'];
-        
+
         $insert = mysqli_query($conn, "INSERT INTO payments (order_id, metode, jumlah_dibayar, tanggal_bayar, payment_status) 
           VALUES ('$order_id', '$metode', '$jumlah', NOW(), 'pending')");
         if (!$insert) throw new Exception(mysqli_error($conn));
       }
     }
-    
+
     $update = mysqli_query($conn, "UPDATE orders SET status='$status' WHERE order_id='$order_id'");
     if (!$update) throw new Exception(mysqli_error($conn));
-    
+
     mysqli_commit($conn);
     echo "<script>alert('Status order diperbarui'); window.location='order_admin.php';</script>";
   } catch (Exception $e) {
     mysqli_rollback($conn);
-    echo "<script>alert('Error: ".addslashes($e->getMessage())."'); window.location='order_admin.php';</script>";
+    echo "<script>alert('Error: " . addslashes($e->getMessage()) . "'); window.location='order_admin.php';</script>";
   }
 }
 
+// --- Update Payment Status ---
 // --- Update Payment Status ---
 if (isset($_POST['update_payment_status'])) {
   $payment_id = $_POST['payment_id'];
   $status = $_POST['payment_status'];
 
-  mysqli_query($conn, "UPDATE payments SET payment_status='$status' WHERE payment_id='$payment_id'");
+  // Start transaction
+  mysqli_begin_transaction($conn);
 
-  $redirect_url = 'order_admin.php';
-  if (isset($_GET['view_payments'])) {
-    $redirect_url .= '?view_payments=1';
+  try {
+    // Update payment status
+    mysqli_query($conn, "UPDATE payments SET payment_status='$status' WHERE payment_id='$payment_id'");
+
+    // If status is rejected, cancel the order and restore stock
+    if ($status == 'rejected') {
+      // Get order ID from payment
+      $payment_query = mysqli_query($conn, "SELECT order_id FROM payments WHERE payment_id='$payment_id'");
+      $payment_data = mysqli_fetch_assoc($payment_query);
+      $order_id = $payment_data['order_id'];
+
+      // Update order status to 'batal'
+      mysqli_query($conn, "UPDATE orders SET status='batal' WHERE order_id='$order_id'");
+
+      // Get all products in this order
+      $order_items = mysqli_query($conn, "SELECT product_id, jumlah FROM order_details WHERE order_id='$order_id'");
+
+      // Restore stock for each product
+      while ($item = mysqli_fetch_assoc($order_items)) {
+        $product_id = $item['product_id'];
+        $quantity = $item['jumlah'];
+
+        mysqli_query($conn, "UPDATE products SET stok = stok + $quantity WHERE product_id='$product_id'");
+      }
+
+      // Add tracking record
+      mysqli_query($conn, "INSERT INTO order_tracking (order_id, status, description) 
+                          VALUES ('$order_id', 'batal', 'Pembayaran ditolak, silahkan belanja kembali.')");
+    }
+
+    mysqli_commit($conn);
+
+    $redirect_url = 'order_admin.php';
+    if (isset($_GET['view_payments'])) {
+      $redirect_url .= '?view_payments=1';
+    }
+    echo "<script>alert('Status pembayaran diperbarui'); window.location='$redirect_url';</script>";
+    exit();
+  } catch (Exception $e) {
+    mysqli_rollback($conn);
+    echo "<script>alert('Error: " . addslashes($e->getMessage()) . "'); window.location='order_admin.php';</script>";
+    exit();
   }
-  echo "<script>alert('Status pembayaran diperbarui'); window.location='$redirect_url';</script>";
-  exit();
 }
 
 // --- Ambil Semua Customer untuk Dropdown ---
@@ -186,6 +225,7 @@ if (isset($_GET['view_payments'])) {
         <option value="pending" <?= $status_filter === 'pending' ? 'selected' : '' ?>>Pending</option>
         <option value="proses" <?= $status_filter === 'proses' ? 'selected' : '' ?>>Proses</option>
         <option value="selesai" <?= $status_filter === 'selesai' ? 'selected' : '' ?>>Selesai</option>
+          <option value="batal" <?= $row['status'] === 'batal' ? 'selected' : '' ?>>Batal</option>
       </select>
     </div>
     <div class="grid grid-cols-2 gap-2">
@@ -236,6 +276,7 @@ if (isset($_GET['view_payments'])) {
                     <option value="pending" <?= $row['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
                     <option value="proses" <?= $row['status'] === 'proses' ? 'selected' : '' ?>>Proses</option>
                     <option value="selesai" <?= $row['status'] === 'selesai' ? 'selected' : '' ?>>Selesai</option>
+                    <option value="batal" <?= $row['status'] === 'batal' ? 'selected' : '' ?>>Batal</option>
                   </select>
                   <button type="submit" name="update_status" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-sm">
                     Update
@@ -334,7 +375,7 @@ if (isset($_GET['view_payments'])) {
                 <?php endif; ?>
               </td>
 
-             
+
             </tr>
           <?php endwhile; ?>
         </tbody>
